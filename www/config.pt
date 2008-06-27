@@ -1,0 +1,33 @@
+<div tal:replace="structure here/manage_page_header|nothing" />
+<div tal:replace="structure here/manage_tabs" />
+
+<h2 tal:define="form_title string:WebServerAuth Options"
+    tal:replace="structure here/manage_form_title" />
+
+<form tal:define="config context/getConfig" method="post" action="manage_changeConfig">
+    <table border="0" cellspacing="0" cellpadding="2">
+        <tr>
+            <td>
+                <input type="checkbox" id="strip_domain_names" name="strip_domain_names" value="1" tal:attributes="checked config/strip_domain_names" />
+            </td>
+            <td>
+                <label for="strip_domain_names">Strip domain names from usernames</label>
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellspacing="0" cellpadding="2">
+        <tr>
+            <td>
+                <label for="username_header">HTTP header containing username:</label>
+            </td>
+            <td>
+                <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" />
+            </td>
+        </tr>
+    </table>
+    
+    <input type="submit" name="submit" value="Save Changes" />
+</form>
+
+<tal:footer tal:replace="structure here/manage_page_footer|nothing">Footer</tal:footer>
