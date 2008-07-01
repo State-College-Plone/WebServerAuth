@@ -2,7 +2,7 @@ from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin
+from Products.PluggableAuthService.interfaces.plugins import IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin
 from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
@@ -18,6 +18,22 @@ usernameKey = 'apache_username'
 defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
 
 
+class RolesPlugin(object):
+    """Grant everybody who comes in with a filled out auth header the Member role."""
+    security = ClassSecurityInfo()
+
+    security.declarePrivate('getRolesForPrincipal')
+    def getRolesForPrincipal(self, principal, request=None):
+        # We could just grant the role to everybody, but let's be conservative. Why not?
+        if request and request.environ.get(self.config[usernameHeaderKey]) == principal.getUserName():
+            import pdb;pdb.set_trace()
+            return ['Member']
+        else:
+            return []
+
+InitializeClass(RolesPlugin)
+
+
 # Cribbed from OpenID plugin
 class UserEnumerationPlugin(object):
     """Slightly evil enumerator.
@@ -28,6 +44,9 @@ class UserEnumerationPlugin(object):
     We do this by checking for the exact kind of call the PAS getUserById
     implementation makes.
     """
+    security = ClassSecurityInfo()
+
+    security.declarePrivate('enumerateUsers')
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
         if id and login and id != login:
             return None
@@ -46,6 +65,8 @@ class UserEnumerationPlugin(object):
                     "login": key,
                     "pluginid": self.getId(),
                 } ]
+
+InitializeClass(UserEnumerationPlugin)
 
 
 class AuthPlugin(object):
@@ -117,7 +138,7 @@ class ExtractionPlugin(object):
 InitializeClass(ExtractionPlugin)
 
 
-class MultiPlugin(UserEnumerationPlugin, AuthPlugin, ExtractionPlugin, BasePlugin):
+class MultiPlugin(RolesPlugin, UserEnumerationPlugin, AuthPlugin, ExtractionPlugin, BasePlugin):
     """An aggregation of all the available apache PAS plugins."""
     security = ClassSecurityInfo()
     meta_type = 'WebServerAuth Plugin'
@@ -161,6 +182,6 @@ class MultiPlugin(UserEnumerationPlugin, AuthPlugin, ExtractionPlugin, BasePlugi
         self.config = self.config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
 
-implementedInterfaces = [IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin]
+implementedInterfaces = [IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin]
 classImplements(MultiPlugin, *implementedInterfaces)
 InitializeClass(MultiPlugin)

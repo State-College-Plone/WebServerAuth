@@ -2,8 +2,6 @@
 
 from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
-from Testing.ZopeTestCase import user_name
-from zope.publisher.tests.httprequest import TestRequest
 
 
 PloneTestCase.installProduct('WebServerAuth')
@@ -18,7 +16,7 @@ class TestMembership(PloneTestCase.PloneTestCase):
         self.acl_users = getToolByName(self.portal, 'acl_users')
             
         # Rig the REQUEST so it looks like we traversed to the root of the Plone site:
-        # Does this leak out of this testcase?
+        # TODO: Does this leak out of this testcase?
         self.app.REQUEST.set('PUBLISHED', self.portal)
         self.app.REQUEST.set('PARENTS', [self.app])
         self.app.REQUEST.steps = list(self.portal.getPhysicalPath())
@@ -27,7 +25,7 @@ class TestMembership(PloneTestCase.PloneTestCase):
     def testMemberRole(self):
         """Assert we grant Member role to users."""
         user = self.acl_users.validate(self.app.REQUEST)
-        self.failUnless(user.has_role('Member'), msg="Known failure: Failed to grant the Member role to the user I made.")
+        self.failUnless(user.has_role('Member'), msg="Failed to grant the Member role to the user I made.")
     
     def testMemberFolderMaking(self):
         """Assert we make a member folder if that option in Plone is enabled."""
