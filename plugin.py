@@ -26,7 +26,6 @@ class RolesPlugin(object):
     def getRolesForPrincipal(self, principal, request=None):
         # We could just grant the role to everybody, but let's be conservative. Why not?
         if request and request.environ.get(self.config[usernameHeaderKey]) == principal.getUserName():
-            import pdb;pdb.set_trace()
             return ['Member']
         else:
             return []
