@@ -1,8 +1,5 @@
-# This lets you install WebServerAuth through Plone, if you're into that. If you aren't using Plone, it doesn't hurt anything.
-
 from Products.CMFCore.utils import getToolByName
-from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin, IExtractionPlugin
-from Products.WebServerAuth.plugin import MultiPlugin
+from Products.WebServerAuth.plugin import MultiPlugin, implementedInterfaces
 from Products.WebServerAuth.utils import firstIdOfClass
 
 
@@ -18,7 +15,7 @@ def install(portal):
     
     # Activate it:
     plugins = acl_users.plugins
-    for interface in [IAuthenticationPlugin, IExtractionPlugin]:
+    for interface in implementedInterfaces:
         plugins.activatePlugin(interface, id)  # plugins is a PluginRegistry
  
 def uninstall(portal):

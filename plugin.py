@@ -1,7 +1,8 @@
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
+from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin, IExtractionPlugin
+from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin
 from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
@@ -17,6 +18,36 @@ usernameKey = 'apache_username'
 defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
 
 
+# Cribbed from OpenID plugin
+class UserEnumerationPlugin(object):
+    """Slightly evil enumerator.
+
+    This is needed to be able to get PAS to return a user which it should
+    be able to handle but who can not be enumerated.
+
+    We do this by checking for the exact kind of call the PAS getUserById
+    implementation makes.
+    """
+    def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
+        if id and login and id != login:
+            return None
+
+        if (id and not exact_match) or kw:
+            return None
+
+        key = id and id or login
+        #
+        # if not (key.startswith("http:") or key.startswith("https:")):
+        #     return None
+        # This will probably kick in too often due to the commented-out above.
+
+        return [ {
+                    "id": key,
+                    "login": key,
+                    "pluginid": self.getId(),
+                } ]
+
+
 class AuthPlugin(object):
     """An authentication mixin that expects credentials in the format returned by the ExtractionPlugin below
 
@@ -30,10 +61,26 @@ class AuthPlugin(object):
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
         """See IAuthenticationPlugin."""
+        def setLoginTimes(username, membershipTool):
+            """Do what the logged_in script usually does, with regard to login times, to users after they log in."""
+            # Ripped off and simplified from CMFPlone.MembershipTool.MembershipTool.setLoginTimes():
+            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin
+            now = self.ZopeTime()
+            defaultDate = '2000/01/01'
+            
+            # Duplicate mysterious logic from MembershipTool.py:
+            lastLoginTime = member.getProperty('login_time', defaultDate)  # In Plone 2.5, 'login_time' property is DateTime('2000/01/01') when a user has never logged in, so this default never kicks in. However, I'll assume it was in the MembershipTool code for a reason.
+            if str(lastLoginTime) == defaultDate:
+                lastLoginTime = now
+            member.setMemberProperties({'login_time': now, 'last_login_time': lastLoginTime})
+
         username = credentials.get(usernameKey)
         if username is None:
             return None
         else:
+            membershipTool = getToolByName(self, 'portal_membership')
+            setLoginTimes(username, membershipTool)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen.
+            membershipTool.createMemberArea(member_id=username)
             return username, username
 
 InitializeClass(AuthPlugin)  # Make the security declarations work.
@@ -70,10 +117,10 @@ class ExtractionPlugin(object):
 InitializeClass(ExtractionPlugin)
 
 
-class MultiPlugin(AuthPlugin, ExtractionPlugin, BasePlugin):
+class MultiPlugin(UserEnumerationPlugin, AuthPlugin, ExtractionPlugin, BasePlugin):
     """An aggregation of all the available apache PAS plugins."""
     security = ClassSecurityInfo()
-    meta_type = 'WebServerMultiPlugin'
+    meta_type = 'WebServerAuth Plugin'
 
     def __init__(self, id, title=None):
         AuthPlugin.__init__(self)
@@ -114,5 +161,6 @@ class MultiPlugin(AuthPlugin, ExtractionPlugin, BasePlugin):
         self.config = self.config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
 
-classImplements(MultiPlugin, IAuthenticationPlugin, IExtractionPlugin)
+implementedInterfaces = [IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin]
+classImplements(MultiPlugin, *implementedInterfaces)
 InitializeClass(MultiPlugin)

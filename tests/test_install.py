@@ -1,8 +1,7 @@
 from Products.CMFCore.utils import getToolByName
 from Products.PloneTestCase import PloneTestCase
-from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin, IExtractionPlugin
 from Products.WebServerAuth.utils import firstIdOfClass
-from Products.WebServerAuth.plugin import MultiPlugin
+from Products.WebServerAuth.plugin import MultiPlugin, implementedInterfaces
 
 
 PloneTestCase.installProduct('WebServerAuth')
@@ -23,7 +22,7 @@ class TestInstall(InstallTestCase):
         """Make sure the PAS plugin got into acl_users and activated."""
         pluginId = self.installedMultipluginId()
         self.failUnless(pluginId, msg="Installation didn't put a WebServerAuth multiplugin instance into acl_users.")
-        for interface in [IAuthenticationPlugin, IExtractionPlugin]:
+        for interface in implementedInterfaces:
             self.failUnless(pluginId in self.acl_users['plugins'].listPluginIds(interface), msg="Plugin wasn't activated on the %s interface." % interface.__name__)
 
 

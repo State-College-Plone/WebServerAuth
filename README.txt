@@ -9,7 +9,8 @@ Description
     
     Relationship to apachepas and AutoMemberMakerPasPlugin
     
-        WebServerAuth replaces both apachepas and AutoMemberMakerPasPlugin. It...
+        WebServerAuth replaces both apachepas and AutoMemberMakerPasPlugin.
+        It...
         
             * Jettisons a lot of legacy code and requirements
             
@@ -82,8 +83,7 @@ Troubleshooting
         header to Zope. If you are using Apache, make sure you included the
         <Proxy *> block above.
 
-    I can't access any of the acl_users screens, add users, or do anything
-    useful in the Plone site, but it works with the root acl_users.
+    I can't access any of the acl_users screens, add users, or do anything useful in the Plone site, but it works with the root acl_users.
         
         If you have an existing user with the same ID as your user inside the
         Plone site, this will override your permission/role settings, so you
