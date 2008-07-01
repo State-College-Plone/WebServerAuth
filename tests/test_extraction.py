@@ -37,14 +37,22 @@ class TestExtraction(PloneTestCase.PloneTestCase):
         """Assert the name of the header in which the username is passed can be changed."""
         alternateHeader = 'HTTP_REMOTE_USER'
         request = _MockRequest(environ={alternateHeader: _username})
+        saveHeader = self.plugin.config[usernameHeaderKey]
         self.plugin.config[usernameHeaderKey] = alternateHeader
-        self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
+        try:
+            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
+        finally:
+            self.plugin.config[usernameHeaderKey] = saveHeader
     
     def testDomainStripping(self):
         """Assert choosing to not strip the domain off the end of a whatever@here.com username works."""
         request = _MockRequest(environ={defaultUsernameHeader: _userAtDomain})
+        saveStrip = self.plugin.config[stripDomainNamesKey]
         self.plugin.config[stripDomainNamesKey] = False
-        self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userAtDomain})
+        try:
+            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userAtDomain})
+        finally:
+            self.plugin.config[stripDomainNamesKey] = saveStrip
 
 
 def test_suite():
