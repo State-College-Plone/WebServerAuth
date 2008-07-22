@@ -8,6 +8,17 @@
     <table border="0" cellspacing="0" cellpadding="2">
         <tr>
             <td>
+                <label for="username_header">HTTP header containing username:</label>
+            </td>
+            <td>
+                <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" />
+            </td>
+        </tr>
+    </table>
+
+    <table border="0" cellspacing="0" cellpadding="2">
+        <tr>
+            <td>
                 <input type="checkbox" id="strip_domain_names" name="strip_domain_names" value="1" tal:attributes="checked config/strip_domain_names" />
             </td>
             <td>
@@ -19,10 +30,18 @@
     <table border="0" cellspacing="0" cellpadding="2">
         <tr>
             <td>
-                <label for="username_header">HTTP header containing username:</label>
+                <input type="radio" name="auto_create_users" id="auto_create_users_1" value="1" tal:attributes="checked config/auto_create_users" />
             </td>
             <td>
-                <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" />
+                <label for="auto_create_users_1">Admit any user that Apache authenticates</label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="auto_create_users" id="auto_create_users_0" value="0" tal:attributes="checked not:config/auto_create_users" />
+            </td>
+            <td>
+                <label for="auto_create_users_0">Admit only users made within Plone</label>
             </td>
         </tr>
     </table>

@@ -38,6 +38,14 @@ class TestMembership(PloneTestCase.PloneTestCase):
             if not folderCreationWasOn:
                 self.membershipTool.setMemberareaCreationFlag()
         self.failUnless(self.membershipTool.getHomeFolder(_userId), msg="Failed to make a member folder for the new user.")
+    
+    def testMemberSearch(self):
+        """Make sure auto-made members show up in searches.
+        
+        (Before we started setting login times, this didn't happen.)
+        
+        """
+        self.failUnless(len(self.acl_users.searchUsers(login=_userId)) == 1, "The automatically made user didn't show up in a search.")  # searchUsers is what Plone 3.0 indirectly calls from /Members.
         
 #     def testEnumeration(self):
 #         """Make sure our PAS enumeration plugin spits out the users who have a member folder; that's better than nothing."""

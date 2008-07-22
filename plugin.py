@@ -11,6 +11,7 @@ from Products.WebServerAuth.utils import wwwDirectory
 # Keys for storing config:
 stripDomainNamesKey = 'strip_domain_names'
 usernameHeaderKey = 'username_header'
+autocreateUsersKey = 'auto_create_users'
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -35,24 +36,30 @@ InitializeClass(RolesPlugin)
 
 # Cribbed from OpenID plugin
 class UserEnumerationPlugin(object):
-    """Slightly evil enumerator.
-
-    This is needed to be able to get PAS to return a user which it should
-    be able to handle but who can not be enumerated.
-
-    We do this by checking for the exact kind of call the PAS getUserById
-    implementation makes.
+    """Evil, layer-violating enumerator to get unenumeratable users to show up in searches.
+    
+    PAS doesn't seem to make an allowance for finding an existing user in a search if that user cannot be enumerated, so we try to guess who's calling and make that happen.
+    
+    This also makes the searched-for user show up on the Sharing tab even if he doesn't exist. This is good, because it allows privs to be granted to CoSign-dwelling people even if they haven't logged in or been manually created yet.
     """
     security = ClassSecurityInfo()
 
     security.declarePrivate('enumerateUsers')
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
+        # If we're not auto-creating users, then don't pretend they're there:
+        if not self.config[autocreateUsersKey]:
+            return []
+
         if id and login and id != login:
-            return None
+            return []
 
         if (id and not exact_match) or kw:
-            return None
-
+            return []
+        
+        # Don't enumerate root-level acl_users principals. That causes crashes like in https://weblion.psu.edu/trac/weblion/ticket/650 because they don't have userids.
+        if id is None and login is None:
+            return []
+        
         key = id and id or login
         #
         # if not (key.startswith("http:") or key.startswith("https:")):
@@ -81,10 +88,9 @@ class AuthPlugin(object):
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
         """See IAuthenticationPlugin."""
-        def setLoginTimes(username, membershipTool):
+        def setLoginTimes(username, member):
             """Do what the logged_in script usually does, with regard to login times, to users after they log in."""
             # Ripped off and simplified from CMFPlone.MembershipTool.MembershipTool.setLoginTimes():
-            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin
             now = self.ZopeTime()
             defaultDate = '2000/01/01'
             
@@ -99,7 +105,10 @@ class AuthPlugin(object):
             return None
         else:
             membershipTool = getToolByName(self, 'portal_membership')
-            setLoginTimes(username, membershipTool)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen.
+            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin
+            if member is None:
+                return None
+            setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen.
             membershipTool.createMemberArea(member_id=username)
             return username, username
 
@@ -143,6 +152,8 @@ class MultiPlugin(RolesPlugin, UserEnumerationPlugin, AuthPlugin, ExtractionPlug
     meta_type = 'WebServerAuth Plugin'
 
     def __init__(self, id, title=None):
+        RolesPlugin.__init__(self)
+        UserEnumerationPlugin.__init__(self)
         AuthPlugin.__init__(self)
         ExtractionPlugin.__init__(self)
         BasePlugin.__init__(self)
@@ -157,6 +168,8 @@ class MultiPlugin(RolesPlugin, UserEnumerationPlugin, AuthPlugin, ExtractionPlug
                 # IISCosign insists on using HTTP_REMOTE_USER instead of
                 # HTTP_X_REMOTE_USER:
                 usernameHeaderKey: defaultUsernameHeader,
+                
+                autocreateUsersKey: True,
             }
 
     # A method to return the configuration page:
@@ -178,6 +191,7 @@ class MultiPlugin(RolesPlugin, UserEnumerationPlugin, AuthPlugin, ExtractionPlug
         """Update my configuration based on form data."""
         self.config[stripDomainNamesKey] = REQUEST.form.get(stripDomainNamesKey) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
         self.config[usernameHeaderKey] = REQUEST.form[usernameHeaderKey]
+        self.config[autocreateUsersKey] = REQUEST.form[autocreateUsersKey] == '1'
         self.config = self.config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
 

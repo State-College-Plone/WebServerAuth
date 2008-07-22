@@ -9,7 +9,7 @@ def install(portal):
     # Put a WebServerAuth multiplugin in the acl_users folder, if there isn't one:
     id = firstIdOfClass(acl_users, MultiPlugin)
     if not id:
-        id = 'web-server-auth'
+        id = 'web_server_auth'
         constructors = acl_users.manage_addProduct['WebServerAuth']  # http://wiki.zope.org/zope2/ObjectManager
         constructors.manage_addWebServerAuth(id, title='WebServerAuth Plugin')
     
