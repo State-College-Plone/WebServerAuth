@@ -2,7 +2,7 @@ from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PluggableAuthService.interfaces.plugins import IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin
+from Products.PluggableAuthService.interfaces.plugins import IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin
 from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
@@ -24,6 +24,22 @@ class MultiPlugin(BasePlugin):
     meta_type = 'WebServerAuth Plugin'
     
     ## PAS interface implementations: ############################
+    
+    protocol = 'http'
+    security.declarePrivate('challenge')
+    def challenge(self, request, response):
+#         if request.ACTUAL_URL.startswith('https://'):
+#             url = "%s/insufficient_privileges" % self.portal_url()
+        if request.ACTUAL_URL.startswith('http://'):
+            # Let the web server auth have a swing at it:
+            response.redirect(request.ACTUAL_URL.replace('http://', 'https://', 1), lock=True)
+            return True
+        else:  # There's nothing more we can do.
+            return False
+#         if we're on HTTPS:
+#             Tough luck: insufficient
+#         else:
+#             redirect to HTTPS side
     
     security.declarePrivate('getRolesForPrincipal')
     def getRolesForPrincipal(self, principal, request=None):
@@ -170,6 +186,6 @@ class MultiPlugin(BasePlugin):
         self.config = self.config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
 
-implementedInterfaces = [IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin]
+implementedInterfaces = [IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin]
 classImplements(MultiPlugin, *implementedInterfaces)
 InitializeClass(MultiPlugin)  # Make the security declarations work.

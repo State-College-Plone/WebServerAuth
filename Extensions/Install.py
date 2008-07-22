@@ -1,4 +1,5 @@
 from Products.CMFCore.utils import getToolByName
+from Products.PluggableAuthService.interfaces.plugins import IChallengePlugin
 from Products.WebServerAuth.plugin import MultiPlugin, implementedInterfaces
 from Products.WebServerAuth.utils import firstIdOfClass
 
@@ -17,6 +18,10 @@ def install(portal):
     plugins = acl_users.plugins
     for interface in implementedInterfaces:
         plugins.activatePlugin(interface, id)  # plugins is a PluginRegistry
+    
+    # Make the Challenge plugin the first in the list:
+    for i in range(list(plugins.listPluginIds(IChallengePlugin)).index(id)):
+        plugins.movePluginsUp(IChallengePlugin, [id])
     
     # Set up login and logout links:
     user_actions = getToolByName(portal, 'portal_actions')['user']

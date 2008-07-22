@@ -16,16 +16,13 @@ Description
             
             * Improves test coverage
             
-            * Provides a challenge handler: no more bogus login forms popping
-              up
+            * Provides a challenge handler that redirects the user to the HTTPS
+              side: no more bogus login forms popping up
             
             * Is unapologetically a Plone product: no more plain Zope support
             
             * Twiddles Plone's login and logout links as necessary: less manual
               configuration
-            
-            * Uses better login hooks exclusive to Plone 3: no more hacky making
-              of members within an auth handler
 
 
 Requirements
@@ -132,6 +129,16 @@ Testing
     To run the WebServerAuth tests, use the standard Zope testrunner::
     
         $INSTANCE_HOME/bin/zopectl test -pvvm Products.WebServerAuth
+
+
+Future Plans
+
+    * Execute political machinations necessary to let PAS find users who aren't
+      enumerable so we can junk the hackish user enumerator.
+    
+    * Scheme and connive until Plone fires the IUserCreatedEvent properly, not
+      just if the login form is used. Then we can get rid of the
+      make-users-inside-an-auth-handler madness.
 
 
 Authorship
