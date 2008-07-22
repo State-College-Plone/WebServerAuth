@@ -17,9 +17,19 @@ def install(portal):
     plugins = acl_users.plugins
     for interface in implementedInterfaces:
         plugins.activatePlugin(interface, id)  # plugins is a PluginRegistry
- 
+    
+    # Set up login and logout links:
+    user_actions = getToolByName(portal, 'portal_actions')['user']
+    user_actions['login']._updateProperty('url_expr', "python:request.ACTUAL_URL.replace('http://', 'https://', 1)")
+    user_actions['logout']._updateProperty('url_expr', "string:https://webaccess.psu.edu/cgi-bin/logout")
+    
 def uninstall(portal):
     acl_users = getToolByName(portal, 'acl_users')
     id = firstIdOfClass(acl_users, MultiPlugin)
     if id:
         acl_users.manage_delObjects(ids=[id])  # implicitly deactivates
+    
+    # Revert login and logout links to their stock settings:
+    user_actions = getToolByName(portal, 'portal_actions')['user']
+    user_actions['login']._updateProperty('url_expr', "string:${portal_url}/login_form")
+    user_actions['logout']._updateProperty('url_expr', "string:${portal_url}/logout")
