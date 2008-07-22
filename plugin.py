@@ -19,33 +19,31 @@ usernameKey = 'apache_username'
 defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
 
 
-class RolesPlugin(object):
-    """Grant everybody who comes in with a filled out auth header the Member role."""
+class MultiPlugin(BasePlugin):
     security = ClassSecurityInfo()
-
+    meta_type = 'WebServerAuth Plugin'
+    
+    ## PAS interface implementations: ############################
+    
     security.declarePrivate('getRolesForPrincipal')
     def getRolesForPrincipal(self, principal, request=None):
+        """Grant everybody who comes in with a filled out auth header the Member role."""
         # We could just grant the role to everybody, but let's be conservative. Why not?
         if request and request.environ.get(self.config[usernameHeaderKey]) == principal.getUserName():
             return ['Member']
         else:
             return []
 
-InitializeClass(RolesPlugin)
-
-
-# Cribbed from OpenID plugin
-class UserEnumerationPlugin(object):
-    """Evil, layer-violating enumerator to get unenumeratable users to show up in searches.
-    
-    PAS doesn't seem to make an allowance for finding an existing user in a search if that user cannot be enumerated, so we try to guess who's calling and make that happen.
-    
-    This also makes the searched-for user show up on the Sharing tab even if he doesn't exist. This is good, because it allows privs to be granted to CoSign-dwelling people even if they haven't logged in or been manually created yet.
-    """
-    security = ClassSecurityInfo()
-
     security.declarePrivate('enumerateUsers')
+    # Cribbed from OpenID plugin
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
+        """Evil, layer-violating enumerator to get unenumeratable users to show up in searches.
+        
+        PAS doesn't seem to make an allowance for finding an existing user in a search if that user cannot be enumerated, so we try to guess who's calling and make that happen.
+        
+        This also makes the searched-for user show up on the Sharing tab even if he doesn't exist. This is good, because it allows privs to be granted to CoSign-dwelling people even if they haven't logged in or been manually created yet.
+        
+        """
         # If we're not auto-creating users, then don't pretend they're there:
         if not self.config[autocreateUsersKey]:
             return []
@@ -72,22 +70,15 @@ class UserEnumerationPlugin(object):
                     "pluginid": self.getId(),
                 } ]
 
-InitializeClass(UserEnumerationPlugin)
-
-
-class AuthPlugin(object):
-    """An authentication mixin that expects credentials in the format returned by the ExtractionPlugin below
-
-    Example:
-      >>> AuthPlugin().authenticateCredentials({usernameKey: 'foobar'})
-      ('foobar', 'foobar')
-
-    """
-    security = ClassSecurityInfo()
-
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
-        """See IAuthenticationPlugin."""
+        """Expects credentials in the format returned by extractCredentials() below.
+    
+        Example:
+          >>> authenticateCredentials({usernameKey: 'foobar'})
+          ('foobar', 'foobar')
+    
+        """
         def setLoginTimes(username, member):
             """Do what the logged_in script usually does, with regard to login times, to users after they log in."""
             # Ripped off and simplified from CMFPlone.MembershipTool.MembershipTool.setLoginTimes():
@@ -112,29 +103,22 @@ class AuthPlugin(object):
             membershipTool.createMemberArea(member_id=username)
             return username, username
 
-InitializeClass(AuthPlugin)  # Make the security declarations work.
-
-
-class ExtractionPlugin(object):
-    """An extraction mixin that gets credentials from a request header passed into Zope
-
-    Example:
-      >>> class MockRequest:
-      ...     def __init__(self, environ={}):
-      ...         self.environ = environ
-
-      >>> request = MockRequest({'HTTP_X_REMOTE_USER': 'foobar'})
-
-      >>> handler = MultiPlugin('someId')  # ExtractionPlugin is an abstract class, but MultiPlugin fills it out.
-      >>> handler.extractCredentials(request)
-      {'apache_username': 'foobar'}
-
-    """
-    security = ClassSecurityInfo()
-
     security.declarePrivate('extractCredentials')
     def extractCredentials(self, request):
-        """See IExtractionPlugin."""
+        """Get credentials from a request header passed into Zope.
+    
+        Example:
+          >>> class MockRequest:
+          ...     def __init__(self, environ={}):
+          ...         self.environ = environ
+    
+          >>> request = MockRequest({'HTTP_X_REMOTE_USER': 'foobar'})
+    
+          >>> handler = MultiPlugin('someId')
+          >>> handler.extractCredentials(request)
+          {'apache_username': 'foobar'}
+    
+        """
         username = request.environ.get(self.config[usernameHeaderKey])
         if not username:
             return None
@@ -142,20 +126,11 @@ class ExtractionPlugin(object):
             # With some setups, the username is returned as 'user123@some.domain.name'.
             username = username.split('@', 1)[0]
         return {usernameKey: username}
-
-InitializeClass(ExtractionPlugin)
-
-
-class MultiPlugin(RolesPlugin, UserEnumerationPlugin, AuthPlugin, ExtractionPlugin, BasePlugin):
-    """An aggregation of all the available apache PAS plugins."""
-    security = ClassSecurityInfo()
-    meta_type = 'WebServerAuth Plugin'
-
+    
+    
+    ## ZMI crap: ############################
+    
     def __init__(self, id, title=None):
-        RolesPlugin.__init__(self)
-        UserEnumerationPlugin.__init__(self)
-        AuthPlugin.__init__(self)
-        ExtractionPlugin.__init__(self)
         BasePlugin.__init__(self)
 
         self._setId(id)
@@ -197,4 +172,4 @@ class MultiPlugin(RolesPlugin, UserEnumerationPlugin, AuthPlugin, ExtractionPlug
 
 implementedInterfaces = [IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin]
 classImplements(MultiPlugin, *implementedInterfaces)
-InitializeClass(MultiPlugin)
+InitializeClass(MultiPlugin)  # Make the security declarations work.

@@ -24,6 +24,7 @@ def install(portal):
     user_actions['logout']._updateProperty('url_expr', "string:https://webaccess.psu.edu/cgi-bin/logout")
     
 def uninstall(portal):
+    # Delete the multiplugin instance:
     acl_users = getToolByName(portal, 'acl_users')
     id = firstIdOfClass(acl_users, MultiPlugin)
     if id:
