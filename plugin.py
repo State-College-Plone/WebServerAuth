@@ -28,18 +28,12 @@ class MultiPlugin(BasePlugin):
     protocol = 'http'
     security.declarePrivate('challenge')
     def challenge(self, request, response):
-#         if request.ACTUAL_URL.startswith('https://'):
-#             url = "%s/insufficient_privileges" % self.portal_url()
         if request.ACTUAL_URL.startswith('http://'):
             # Let the web server auth have a swing at it:
             response.redirect(request.ACTUAL_URL.replace('http://', 'https://', 1), lock=True)
             return True
         else:  # There's nothing more we can do.
             return False
-#         if we're on HTTPS:
-#             Tough luck: insufficient
-#         else:
-#             redirect to HTTPS side
     
     security.declarePrivate('getRolesForPrincipal')
     def getRolesForPrincipal(self, principal, request=None):
@@ -53,9 +47,9 @@ class MultiPlugin(BasePlugin):
     security.declarePrivate('enumerateUsers')
     # Cribbed from OpenID plugin
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
-        """Evil, layer-violating enumerator to get unenumeratable users to show up in searches.
+        """Evil, layer-violating enumerator to get unenumeratable users to be validatable.
         
-        PAS doesn't seem to make an allowance for finding an existing user in a search if that user cannot be enumerated, so we try to guess who's calling and make that happen.
+        PAS doesn't seem to make an allowance for authorizing (IIRC) an existing user if that user cannot be enumerated, so we try to guess who's calling and make that happen.
         
         This also makes the searched-for user show up on the Sharing tab even if he doesn't exist. This is good, because it allows privs to be granted to CoSign-dwelling people even if they haven't logged in or been manually created yet.
         
