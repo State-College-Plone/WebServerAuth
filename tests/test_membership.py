@@ -16,15 +16,18 @@ class TestMembership(PloneTestCase.PloneTestCase):
         self.acl_users = getToolByName(self.portal, 'acl_users')
             
         # Rig the REQUEST so it looks like we traversed to the root of the Plone site:
-        # TODO: Does this leak out of this testcase?
-        self.app.REQUEST.set('PUBLISHED', self.portal)
+        old_parents = self.app.REQUEST.get('PARENTS')
         self.app.REQUEST.set('PARENTS', [self.app])
-        self.app.REQUEST.steps = list(self.portal.getPhysicalPath())
-        self.app.REQUEST.environ['HTTP_X_REMOTE_USER'] = _userId
+        request = self.request = self.app.REQUEST.clone()
+        self.app.REQUEST.set('PARENTS', old_parents)
+        
+        request.set('PUBLISHED', self.portal)
+        request.steps = list(self.portal.getPhysicalPath())
+        request.environ['HTTP_X_REMOTE_USER'] = _userId
     
     def testMemberRole(self):
         """Assert we grant Member role to users."""
-        user = self.acl_users.validate(self.app.REQUEST)
+        user = self.acl_users.validate(self.request)
         self.failUnless(user.has_role('Member'), msg="Failed to grant the Member role to the user I made.")
     
     def testMemberFolderMaking(self):
@@ -33,7 +36,7 @@ class TestMembership(PloneTestCase.PloneTestCase):
         if not folderCreationWasOn:
             self.membershipTool.setMemberareaCreationFlag()  # so we can test member-folder-making, which is off by default in Plone 3.0
         try:
-            user = self.acl_users.validate(self.app.REQUEST)  # Fire off the whole PAS stack so our unholy member-making authentication plugin runs.
+            user = self.acl_users.validate(self.request)  # Fire off the whole PAS stack so our unholy member-making authentication plugin runs.
         finally:  # Put things back as we found them.
             if not folderCreationWasOn:
                 self.membershipTool.setMemberareaCreationFlag()
