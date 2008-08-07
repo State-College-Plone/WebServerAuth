@@ -39,46 +39,28 @@ class MultiPlugin(BasePlugin):
     def getRolesForPrincipal(self, principal, request=None):
         """Grant everybody who comes in with a filled out auth header the Member role."""
         # We could just grant the role to everybody, but let's be conservative. Why not?
-        if request and request.environ.get(self.config[usernameHeaderKey]) == principal.getUserName():
+        if self._userIdIsLoggedIn(principal.getUserName(), request):
             return ['Member']
         else:
             return []
 
     security.declarePrivate('enumerateUsers')
-    # Cribbed from OpenID plugin
+    # Inspired by the OpenID plugin
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
-        """Evil, layer-violating enumerator to get unenumeratable users to be validatable.
+        """Evil, layer-violating enumerator to get the logged in user, though unenumerable, to be validatable.
         
         PAS doesn't seem to make an allowance for authorizing (IIRC) an existing user if that user cannot be enumerated, so we try to guess who's calling and make that happen.
         
-        This also makes the searched-for user show up on the Sharing tab even if he doesn't exist. This is good, because it allows privs to be granted to CoSign-dwelling people even if they haven't logged in or been manually created yet.
-        
         """
-        # If we're not auto-creating users, then don't pretend they're there:
-        if not self.config[autocreateUsersKey]:
+        # If we're not auto-creating users, then don't pretend they're there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user.
+        if self.config[autocreateUsersKey] and (login is None and id is not None and exact_match is True and not kw and sort_by is None and max_results is None) and self._userIdIsLoggedIn(id, self.REQUEST):
+            return [ {
+                        "id": id,
+                        "login": id,
+                        "pluginid": self.getId()
+                    } ]
+        else:
             return []
-
-        if id and login and id != login:
-            return []
-
-        if (id and not exact_match) or kw:
-            return []
-        
-        # Don't enumerate root-level acl_users principals. That causes crashes like in https://weblion.psu.edu/trac/weblion/ticket/650 because they don't have userids.
-        if id is None and login is None:
-            return []
-        
-        key = id and id or login
-        #
-        # if not (key.startswith("http:") or key.startswith("https:")):
-        #     return None
-        # This will probably kick in too often due to the commented-out above.
-
-        return [ {
-                    "id": key,
-                    "login": key,
-                    "pluginid": self.getId(),
-                } ]
 
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
@@ -179,6 +161,14 @@ class MultiPlugin(BasePlugin):
         self.config[autocreateUsersKey] = REQUEST.form[autocreateUsersKey] == '1'
         self.config = self.config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
+    
+    
+    ## Utils: ############################
+    
+    def _userIdIsLoggedIn(self, userId, request):
+        """Return whether the user having ID `userId` is the user making the request `request`."""
+        return request and request.environ.get(self.config[usernameHeaderKey]) == userId
+    
 
 implementedInterfaces = [IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin]
 classImplements(MultiPlugin, *implementedInterfaces)
