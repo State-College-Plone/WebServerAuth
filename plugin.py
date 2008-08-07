@@ -17,6 +17,7 @@ autocreateUsersKey = 'auto_create_users'
 usernameKey = 'apache_username'
 
 defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
+idPrefix = 'wsa_'
 
 
 class MultiPlugin(BasePlugin):
@@ -47,49 +48,69 @@ class MultiPlugin(BasePlugin):
     security.declarePrivate('enumerateUsers')
     # Cribbed from OpenID plugin
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
-        """Evil, layer-violating enumerator to get unenumeratable users to be validatable.
+        """Enumerator to make ordinarily unenumerable users able to be returned from PluggableAuthService.validate().
         
-        PAS doesn't seem to make an allowance for authorizing (IIRC) an existing user if that user cannot be enumerated, so we try to guess who's calling and make that happen.
-        
-        This also makes the searched-for user show up on the Sharing tab even if he doesn't exist. This is good, because it allows privs to be granted to CoSign-dwelling people even if they haven't logged in or been manually created yet.
+        PAS doesn't seem to make an allowance for authorizing (IIRC) an existing user if that user cannot be enumerated, so we sock away a disgusting little this-is-a-fake-WSA-user token in the user ID and enumerate the user here if we find said token.
         
         """
+        def normalized(id, login):
+            """`id` and `login` can be strings, None, or sequences, according to IUserEnumerationPlugin. It's unspecified whether they're parallel sequences if they're sequences, but I assume they are. Return sequence-ized version of `id` and `login` which might be different lengths. None turns into [].
+            """
+            def toList(thing):
+                if thing is None:
+                    return []
+                elif isinstance(thing, basestring):
+                    return [thing]
+                elif isinstance(thing, tuple):
+                    return list(thing)  # so we can .append() to it
+                else:
+                    return thing
+            
+            id = toList(id)
+            login = toList(login)
+            
+            # Filter out IDs and the parallel logins where the ID doesn't start with our prefix:
+            x = 0
+            while x < len(id):
+                if not id[x].startswith(idPrefix):
+                    del id[x]
+                    try:
+                        del login[x]
+                    except IndexError:
+                        pass
+                else:
+                    x += 1
+            
+            # If one of {login, id} is longer, pad it out with computed values:
+            lenPrefix = len(idPrefix)
+            for curId in id[len(login):]:
+                login.append(curId[lenPrefix:])
+            for curLogin in login[len(id):]:
+                id.append('%s%s' % (idPrefix, curLogin))
+            
+            return id, login
+            
         # If we're not auto-creating users, then don't pretend they're there:
-        if not self.config[autocreateUsersKey]:
+        if self.config[autocreateUsersKey] and exact_match:  # We can't very well do inexact (wildcard) searches, since we have no user store to search. TODO: Maybe search portal_memberdata in the future.
+            ids, logins = normalized(id, login)
+            pluginId = self.getId()
+            return [ { 'id': curId,
+                       'login': curLogin,
+                       'pluginid': pluginId
+                    } for (curId, curLogin) in zip(ids, logins)]
+        else:
             return []
-
-        if id and login and id != login:
-            return []
-
-        if (id and not exact_match) or kw:
-            return []
-        
-        # Don't enumerate root-level acl_users principals. That causes crashes like in https://weblion.psu.edu/trac/weblion/ticket/650 because they don't have userids.
-        if id is None and login is None:
-            return []
-        
-        key = id and id or login
-        #
-        # if not (key.startswith("http:") or key.startswith("https:")):
-        #     return None
-        # This will probably kick in too often due to the commented-out above.
-
-        return [ {
-                    "id": key,
-                    "login": key,
-                    "pluginid": self.getId(),
-                } ]
-
+    
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
         """Expects credentials in the format returned by extractCredentials() below.
     
         Example:
           >>> authenticateCredentials({usernameKey: 'foobar'})
-          ('foobar', 'foobar')
+          ('web_server_auth_foobar', 'foobar')
     
         """
-        def setLoginTimes(username, member):
+        def setLoginTimes(member):
             """Do what the logged_in script usually does, with regard to login times, to users after they log in."""
             # Ripped off and simplified from CMFPlone.MembershipTool.MembershipTool.setLoginTimes():
             now = self.ZopeTime()
@@ -101,17 +122,18 @@ class MultiPlugin(BasePlugin):
                 lastLoginTime = now
             member.setMemberProperties({'login_time': now, 'last_login_time': lastLoginTime})
 
-        username = credentials.get(usernameKey)
-        if username is None:
+        login = credentials.get(usernameKey)
+        if login is None:
             return None
         else:
+            userId = '%s%s' % (idPrefix, login)
             membershipTool = getToolByName(self, 'portal_membership')
-            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin
+            member = membershipTool.getMemberById(userId)  # works thanks to our UserEnumerationPlugin
             if member is None:
                 return None
-            setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen.
-            membershipTool.createMemberArea(member_id=username)
-            return username, username
+            setLoginTimes(member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen.
+            membershipTool.createMemberArea(member_id=userId)
+            return userId, login
 
     security.declarePrivate('extractCredentials')
     def extractCredentials(self, request):

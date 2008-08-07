@@ -7,22 +7,22 @@ Description
     which your web server has an authentication module&mdash;can transparently
     log in using enterprise-wide credentials.
     
-    Relationship to apachepas and AutoMemberMakerPasPlugin
+    WebServerAuth is intended to replace and improve upon apachepas and
+    AutoMemberMakerPasPlugin and is written by some of the same authors.
     
-        WebServerAuth replaces both apachepas and AutoMemberMakerPasPlugin.
-        It...
+    Improvements over apachepas and AutoMemberMakerPasPlugin
+    
+        * Provides a challenge handler that redirects the user to the HTTPS
+          side: no more bogus login forms popping up
         
-            * Jettisons a lot of legacy code and requirements
-            
-            * Improves test coverage
-            
-            * Provides a challenge handler that redirects the user to the HTTPS
-              side: no more bogus login forms popping up
-            
-            * Is unapologetically a Plone product: no more plain Zope support
-            
-            * Twiddles Plone's login and logout links as necessary: less manual
-              configuration
+        * Twiddles Plone's login and logout links as necessary: less manual
+          configuration
+        
+        * Jettisons a lot of legacy code and requirements
+        
+        * Increases test coverage and does away with doctests
+        
+        * Is unapologetically a Plone product: no more plain Zope support
 
 
 Requirements
@@ -46,30 +46,38 @@ Installation
         1. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
            install WebServerAuth.
         
-    3. Tell your web server to pass the username of the logged in user in a
-       header. For example, to configure Apache, you might use these
-       directives::
-     
-        # Some Linux distributions (e.g., Debian Etch and Red Hat Enterprise
-        # Linux AS Release 4) have default settings which prevent the header
-        # rewrites below from working. Fix that:
-        <Proxy *>
-            Order deny,allow
-            Allow from all
-        </Proxy>
-        
-        RewriteEngine On
-        
-        # Grab the remote user as environment variable.
-        # (This RewriteRule doesn't actually rewrite anything URL-wise.)
-        RewriteCond %{LA-U:REMOTE_USER} (.+)
-        RewriteRule .* - [E=RU:%1]
-        
-        # Put the username into the HTTP_X_REMOTE_USER request header:
-        RequestHeader set X_REMOTE_USER %{RU}e
-        
-        # Do the typical VirtualHostMonster rewrite:
-        RewriteRule ^/port_8080(.*) http://localhost:8080/VirtualHostBase/http//localhost:80/VirtualHostRoot/_vh_port_8080/$1 [L,P]
+    3. Have your web server always prompt for authentication on the HTTPS side.
+       Then, have it pass the username of the logged in user in a header. For
+       example, if you're using Apache, you might use something like this::
+        <VirtualHost *:443>
+            ServerName www.example.com
+            
+            # Prompt for authentication:
+            <Location />
+                SSLRequireSSL
+                AuthType Basic
+                AuthName "My Funky Web Site"
+                AuthUserFile /etc/such-and-such
+                # etc.
+        		Require valid-user
+            </Location>
+            
+            # Some Linux distributions (e.g., Debian Etch and Red Hat Enterprise
+            # Linux AS Release 4) have default settings which prevent the header
+            # rewrites below from working. Fix that:
+            <Proxy *>
+                Order deny,allow
+                Allow from all
+            </Proxy>
+            
+            RewriteEngine On
+            
+            # Do the typical VirtualHostMonster rewrite, adding an E= option that puts the Apache-provided username into the remoteUser variable.
+            RewriteRule ^/(.*)$ http://127.0.0.1:8080/VirtualHostBase/https/%{SERVER_NAME}:443/VirtualHostRoot/$1 [L,P,E=remoteUser:%{LA-U:REMOTE_USER}]
+            
+            # Put the saved username into the HTTP_X_REMOTE_USER request header:
+            RequestHeader set X_REMOTE_USER %{remoteUser}e
+        </VirtualHost>
 
 
 Troubleshooting
@@ -85,7 +93,7 @@ Troubleshooting
         If you have an existing user with the same ID as your user inside the
         Plone site, this will override your permission/role settings, so you
         can't access these things on an admin level anymore. Solution: Create
-        a new user with a non-conflicting ID in the root folder, give him the
+        a new user with a non-conflicting ID in the root folder, give it the
         Manager role, and log in with this user instead. Now the acl_users
         should behave normally again, and you should be able to change the
         settings.
@@ -170,4 +178,4 @@ Support
 Version History
     
     ' ' 0.1 -- Initial release. Future releases might not be compatible with
-               this one.
+               this one or might require manual migration.
