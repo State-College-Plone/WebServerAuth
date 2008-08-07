@@ -39,6 +39,7 @@ class MultiPlugin(BasePlugin):
     def getRolesForPrincipal(self, principal, request=None):
         """Grant everybody who comes in with a filled out auth header the Member role."""
         # We could just grant the role to everybody, but let's be conservative. Why not?
+        # If we ever make WSA-manifested users show up in member searches, make this less conservative so they appear to have the Member checkbox checked for them in the Users and Groups control panel.
         if self._userIdIsLoggedIn(principal.getUserName(), request):
             return ['Member']
         else:
@@ -71,27 +72,31 @@ class MultiPlugin(BasePlugin):
           ('foobar', 'foobar')
     
         """
+        defaultDate = '2000/01/01'
         def setLoginTimes(username, member):
             """Do what the logged_in script usually does, with regard to login times, to users after they log in."""
             # Ripped off and simplified from CMFPlone.MembershipTool.MembershipTool.setLoginTimes():
             now = self.ZopeTime()
-            defaultDate = '2000/01/01'
             
             # Duplicate mysterious logic from MembershipTool.py:
             lastLoginTime = member.getProperty('login_time', defaultDate)  # In Plone 2.5, 'login_time' property is DateTime('2000/01/01') when a user has never logged in, so this default never kicks in. However, I'll assume it was in the MembershipTool code for a reason.
             if str(lastLoginTime) == defaultDate:
                 lastLoginTime = now
             member.setMemberProperties({'login_time': now, 'last_login_time': lastLoginTime})
-
+        
         username = credentials.get(usernameKey)
         if username is None:
             return None
         else:
             membershipTool = getToolByName(self, 'portal_membership')
-            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin
-            if member is None:
+            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin  # implicitly creates the record in portal_memberdata, at least when auto user creation is on: see memberdata.py:67
+            
+            if member is None:  # happens only when auto user creation is off
                 return None
-            setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen.
+            
+            if str(member.getProperty('login_time')) == defaultDate:  # This member has never had his login time set; he's never logged in before.
+                # The whole member search thing doesn't work atm.
+                setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen. The real answer is for somebody (Plone or PAS) to fire an event when somebody logs in.
             membershipTool.createMemberArea(member_id=username)
             return username, username
 

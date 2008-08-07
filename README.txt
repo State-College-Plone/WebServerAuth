@@ -15,8 +15,12 @@ Description
         * Provides a challenge handler that redirects the user to the HTTPS
           side: no more bogus login forms popping up
         
-        * Twiddles Plone's login and logout links as necessary: less manual
-          configuration
+        * No longer does every user who has ever logged in spontaneously appear
+          in your Users and Groups control panel. Similarly, the Member role is
+          now granted dynamically.
+        
+        * Twiddles Plone's login and logout links as necessary, reducing the
+          need for manual configuration
         
         * Jettisons a lot of legacy code and requirements
         
@@ -60,6 +64,10 @@ Installation
                 AuthUserFile /etc/such-and-such
                 # etc.
         		Require valid-user
+            
+                # Put the username (stored below) into the HTTP_X_REMOTE_USER request header.
+                # This has to be in the <Location> block for some Apache auth modules, such as PubCookie, which don't set REMOTE_USER until very late.
+                RequestHeader set X_REMOTE_USER %{remoteUser}e
             </Location>
             
             # Some Linux distributions (e.g., Debian Etch and Red Hat Enterprise
@@ -74,9 +82,6 @@ Installation
             
             # Do the typical VirtualHostMonster rewrite, adding an E= option that puts the Apache-provided username into the remoteUser variable.
             RewriteRule ^/(.*)$ http://127.0.0.1:8080/VirtualHostBase/https/%{SERVER_NAME}:443/VirtualHostRoot/$1 [L,P,E=remoteUser:%{LA-U:REMOTE_USER}]
-            
-            # Put the saved username into the HTTP_X_REMOTE_USER request header:
-            RequestHeader set X_REMOTE_USER %{remoteUser}e
         </VirtualHost>
 
 
