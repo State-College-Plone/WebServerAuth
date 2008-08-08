@@ -26,7 +26,6 @@ def install(portal):
     # Set up login and logout links:
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "python:request.ACTUAL_URL.replace('http://', 'https://', 1)")
-    user_actions['logout']._updateProperty('url_expr', "string:https://webaccess.psu.edu/cgi-bin/logout")
     
 def uninstall(portal):
     # Delete the multiplugin instance:
@@ -38,4 +37,3 @@ def uninstall(portal):
     # Revert login and logout links to their stock settings:
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "string:${portal_url}/login_form")
-    user_actions['logout']._updateProperty('url_expr', "string:${portal_url}/logout")

@@ -8,25 +8,30 @@ Description
     log in using enterprise-wide credentials.
     
     WebServerAuth is intended to replace and improve upon apachepas and
-    AutoMemberMakerPasPlugin and is written by some of the same authors.
+    AutoMemberMakerPasPlugin, which come significantly and entirely,
+    respectively, from the same author.
     
     Improvements over apachepas and AutoMemberMakerPasPlugin
     
-        * Provides a challenge handler that redirects the user to the HTTPS
-          side: no more bogus login forms popping up
+        * When an anonymous user tries to access something unpermitted,
+          we redirect him to the HTTPS side, which triggers a proper login
+          prompt. There are no more nonworking login forms popping up as in
+          the old products.
         
-        * No longer does every user who has ever logged in spontaneously appear
-          in your Users and Groups control panel. Similarly, the Member role is
-          now granted dynamically.
+        * No longer does every user who has ever logged in clutter up your Users
+          and Groups control panel. Similarly, the Member role is now granted
+          dynamically.
         
-        * Twiddles Plone's login and logout links as necessary, reducing the
-          need for manual configuration
+        * Twiddles Plone's login link as necessary, reducing the need for
+          manual configuration
         
         * Jettisons a lot of legacy code and requirements
         
         * Increases test coverage and does away with doctests
         
-        * Is unapologetically a Plone product: no more plain Zope support
+        * Is unapologetically a Plone product: no more of the architectural
+          compromises needed to support plain Zope use. This is why we can have
+          one product instead of two!
 
 
 Requirements
@@ -37,18 +42,27 @@ Requirements
 Upgrading
 
     From apachepas and AutoMemberMakerPasPlugin
-
-        1. Write me. Probably just uninstall the former and install this.
+        
+        1. Note your apachepas settings: in the ZMI, your-plone-site &rarr;
+           acl_users &rarr; apachepas.
+        
+        2. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products,
+           and uninstall both apachepas and AutoMemberMakerPasPlugin. If you
+           like, remove them from your Products folder as well.
+        
+        3. Follow the installation instructions below.
+        
+        4. Visit the WebServerAuth configuration page (in the ZMI,
+           your-plone-site &rarr; acl_users &rarr; web_server_auth), and restore
+           the settings you used with apachepas.
 
 
 Installation
 
     1. Copy WebServerAuth to your '$INSTANCE_HOME/Products' directory.
 
-    2. Install the plugin:
-    
-        1. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
-           install WebServerAuth.
+    2. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
+       install WebServerAuth.
         
     3. Have your web server always prompt for authentication on the HTTPS side.
        Then, have it pass the username of the logged in user in a header. For
@@ -83,6 +97,16 @@ Installation
             # Do the typical VirtualHostMonster rewrite, adding an E= option that puts the Apache-provided username into the remoteUser variable.
             RewriteRule ^/(.*)$ http://127.0.0.1:8080/VirtualHostBase/https/%{SERVER_NAME}:443/VirtualHostRoot/$1 [L,P,E=remoteUser:%{LA-U:REMOTE_USER}]
         </VirtualHost>
+    
+    4. Point Plone's Log Out link (in the ZMI: your-plone-site &rarr;
+       portal_actions &rarr; user &rarr; logout) to something sensible. For
+       example, if you're using a single-sign-on system that provides its own
+       logout page, point to that. If you can't think of anything better, make a
+       page that says "Sorry, Bub. You'll have to quit your web browser to log
+       out", and point it at that.
+
+    5. Point the Change Password link (in the ZMI: your-plone-site &rarr;
+       portal_controlpanel) to something sensible, or hide it altogether.
 
 
 Troubleshooting
@@ -107,10 +131,20 @@ Troubleshooting
 Configuration
     
     WebServerAuth ships with sensible defaults, so you probably won't need to
-    configure it at all. If, however, you do, first navigate to your
-    WebServerAuth instance in the ZMI; it will be in '/acl_users' or
-    '/your-plone-site/acl_users'. Click your WebServerAuth instance, then see
-    one of the following sections:
+    configure it at all. But if you do, first navigate to your WebServerAuth
+    instance in the ZMI; it will be in '/your-plone-site/acl_users'. The
+    configuration options are as follows:
+        
+    Admit...
+    
+        If you want to admit only a subset of the users your web server
+        recognizes, select "Only users made within Plone", and use the *Users
+        and Groups* page in *Site Setup* to create the users you want to admit.
+        Users you have not created will still be able to get past your web
+        server's login prompt but will not be recognized by Plone.
+
+        To admit everybody your web server admits, leave "Any user the web
+        server authenticates" selected.
 
     Strip domain names from usernames
     
@@ -121,20 +155,12 @@ Configuration
         cross-domain authorization system like Shibboleth where this could cause
         name collisions), turn off "Strip domain names from usernames".
         
-    HTTP header containing username
+    Username is in the such-and-such header
     
         If, for some reason, you cannot use the default HTTP_X_REMOTE_USER
         header (for instance, if you are using IISCosign, which has
-        "HTTP_REMOTE_USER" hard-coded in), you can change the header
-        WebServerAuth looks in here.
-        
-    Admit only manually created users
-    
-        If you want to admit only a subset of the users that your web server
-        recognizes, check this, and use the *Users and Groups Administration*
-        page in Plone to create the users you want to admit. Users you have not
-        added will still be able to satisfy Apache's login prompt but will not
-        be recognized by Plone.
+        "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
+        in here.
 
 
 Testing
@@ -152,18 +178,24 @@ Future Plans
     * Scheme and connive until Plone fires the IUserCreatedEvent properly, not
       just if the login form is used. Then we can get rid of the
       make-users-inside-an-auth-handler madness.
+    
+    * In stock Plone, users show up in the Users tab search (I'm not talking
+      about the Users and Groups control panel, mind you) immediately after
+      they're created. With WebServerAuth, auto-created users show up in the
+      search after they've logged in at least once. Is this the best compromise
+      between technical constraints and UI consistency? Opinions from people who
+      actually use this search are most welcome.
 
 
 Authorship
 
-    WebServerAuth is written by Erik Rose of the WebLion group at Penn State
-    University.
+    Erik Rose of the WebLion group at Penn State University
 
 
 Thanks
 
     Thanks to Rocky Burt, who wrote the pre-1.1 versions of apachepas, which,
-    along with AutoMemberMakerPasPlugin, led to WebServerAuth.
+    along with my AutoMemberMakerPasPlugin, led to WebServerAuth.
 
     Thanks to Mark James for the ZMI icon, available from
     http://www.famfamfam.com/lab/icons/silk/.
@@ -177,10 +209,9 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=0.1.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.0b1.
 
 
 Version History
     
-    ' ' 0.1 -- Initial release. Future releases might not be compatible with
-               this one or might require manual migration.
+    ' ' 1.0b1 -- First release.
