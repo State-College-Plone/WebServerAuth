@@ -67,6 +67,7 @@ Installation
     3. Have your web server always prompt for authentication on the HTTPS side.
        Then, have it pass the username of the logged in user in a header. For
        example, if you're using Apache, you might use something like this::
+       
         <VirtualHost *:443>
             ServerName www.example.com
             
@@ -77,7 +78,7 @@ Installation
                 AuthName "My Funky Web Site"
                 AuthUserFile /etc/such-and-such
                 # etc.
-        		Require valid-user
+                Require valid-user
             
                 # Put the username (stored below) into the HTTP_X_REMOTE_USER request header.
                 # This has to be in the <Location> block for some Apache auth modules, such as PubCookie, which don't set REMOTE_USER until very late.
@@ -214,4 +215,5 @@ Support
 
 Version History
     
-    ' ' 1.0b1 -- First release.
+    ' ' 1.0b1 -- First release. Not quite feature-complete but should be stable
+                 and future-compatible.

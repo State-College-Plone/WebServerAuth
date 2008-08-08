@@ -39,7 +39,7 @@ class MultiPlugin(BasePlugin):
     def getRolesForPrincipal(self, principal, request=None):
         """Grant everybody who comes in with a filled out auth header the Member role."""
         # We could just grant the role to everybody, but let's be conservative. Why not?
-        # If we ever make WSA-manifested users show up in member searches, make this less conservative so they appear to have the Member checkbox checked for them in the Users and Groups control panel.
+        # If we ever make WSA-manifested users show up in Users and Groups control panel searches, make this less conservative so they appear to have the Member checkbox checked for them.
         if self._userIdIsLoggedIn(principal.getUserName(), request):
             return ['Member']
         else:
@@ -95,7 +95,6 @@ class MultiPlugin(BasePlugin):
                 return None
             
             if str(member.getProperty('login_time')) == defaultDate:  # This member has never had his login time set; he's never logged in before.
-                # The whole member search thing doesn't work atm.
                 setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen. The real answer is for somebody (Plone or PAS) to fire an event when somebody logs in.
             membershipTool.createMemberArea(member_id=username)
             return username, username
