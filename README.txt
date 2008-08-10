@@ -143,21 +143,23 @@ Configuration
     instance in the ZMI; it will be in '/your-plone-site/acl_users'. The
     configuration options are as follows:
         
-    Recognize in Plone...
-    
+    Make Plone recognize...
+
+        *Any user the web server authenticates.* To recognize everybody your
+        web server recognizes, leave this option selected. The downside of
+        this is that, if you have user folders enabled, anybody your web
+        server knows will be able to make one. However, this option is the
+        recommended one, because the UI is the most consistent (read on).
+
         *Only users made within Plone.* If you want to authenticate only some
         of the users your web server recognizes, select this option, and use
         the *Users and Groups* page in *Site Setup* to create the users you
         want to have recognized. Users you don't create will still be able to
         get past your web server's login prompt but will not be recognized by
-        Plone. This option isn't recommended, because the UI is terrible:
-        people will log in and apparently succeed, only to be greeted with a
-        Plone page that still has a "Log In" link.
-
-        *Any user the web server authenticates.* To recognize everybody your
-        web server recognize, leave this option selected. The downside of this
-        is that, if you have user folders enabled, anybody your web server
-        knows will be able to make one.
+        Plone. This option is discouraged, because the UI is terrible: people
+        will log in and apparently succeed, only to be greeted with a Plone
+        page that still has a "Log In" link. If somebody cares to donate
+        themes that fix this, I'm happy to include them.
 
     Strip domain names from usernames
     
