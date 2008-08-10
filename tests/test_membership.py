@@ -36,7 +36,7 @@ class TestMembership(PloneTestCase.PloneTestCase):
         if not folderCreationWasOn:
             self.membershipTool.setMemberareaCreationFlag()  # so we can test member-folder-making, which is off by default in Plone 3.0
         try:
-            user = self.acl_users.validate(self.request)  # Fire off the whole PAS stack so our unholy member-making authentication plugin runs.
+            user = self.acl_users.validate(self.request)  # Fire off the whole PAS stack so our unholy member-folder-making authentication plugin runs.
         finally:  # Put things back as we found them.
             if not folderCreationWasOn:
                 self.membershipTool.setMemberareaCreationFlag()

@@ -1,7 +1,7 @@
 from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.utils import firstInstanceOfClass
-from Products.WebServerAuth.plugin import MultiPlugin, usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey, autocreateUsersKey
+from Products.WebServerAuth.plugin import MultiPlugin, usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey, authenticateEverybodyKey
 
 
 PloneTestCase.installProduct('WebServerAuth')
@@ -60,12 +60,12 @@ class TestExtraction(PloneTestCase.PloneTestCase):
         self.app.REQUEST.steps = list(self.portal.getPhysicalPath())
         self.app.REQUEST.environ['HTTP_X_REMOTE_USER'] = _username
         
-        saveAdmit = self.plugin.config[autocreateUsersKey]
-        self.plugin.config[autocreateUsersKey] = False
+        saveAdmit = self.plugin.config[authenticateEverybodyKey]
+        self.plugin.config[authenticateEverybodyKey] = False
         try:
             self.failUnlessEqual(getToolByName(self.portal, 'acl_users').validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
         finally:
-            self.plugin.config[autocreateUsersKey] = saveAdmit
+            self.plugin.config[authenticateEverybodyKey] = saveAdmit
 
 
 def test_suite():

@@ -2,7 +2,7 @@ from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PluggableAuthService.interfaces.plugins import IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin
+from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin
 from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
@@ -11,7 +11,7 @@ from Products.WebServerAuth.utils import wwwDirectory
 # Keys for storing config:
 stripDomainNamesKey = 'strip_domain_names'
 usernameHeaderKey = 'username_header'
-autocreateUsersKey = 'auto_create_users'
+authenticateEverybodyKey = 'authenticate_everybody'
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -35,16 +35,6 @@ class MultiPlugin(BasePlugin):
         else:  # There's nothing more we can do.
             return False
     
-    security.declarePrivate('getRolesForPrincipal')
-    def getRolesForPrincipal(self, principal, request=None):
-        """Grant everybody who comes in with a filled out auth header the Member role."""
-        # We could just grant the role to everybody, but let's be conservative. Why not?
-        # If we ever make WSA-manifested users show up in Users and Groups control panel searches, make this less conservative so they appear to have the Member checkbox checked for them.
-        if self._userIdIsLoggedIn(principal.getUserName(), request):
-            return ['Member']
-        else:
-            return []
-
     security.declarePrivate('enumerateUsers')
     # Inspired by the OpenID plugin
     def enumerateUsers(self, id=None, login=None, exact_match=False, sort_by=None, max_results=None, **kw):
@@ -53,8 +43,8 @@ class MultiPlugin(BasePlugin):
         PAS doesn't seem to make an allowance for authorizing (IIRC) an existing user if that user cannot be enumerated, so we try to guess who's calling and make that happen.
         
         """
-        # If we're not auto-creating users, then don't pretend they're there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user.
-        if self.config[autocreateUsersKey] and (login is None and id is not None and exact_match is True and not kw and sort_by is None and max_results is None) and self._userIdIsLoggedIn(id, self.REQUEST):
+        # Unless we're admitting non-Plone-dwelling users, don't pretend the user is there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user.
+        if self.config[authenticateEverybodyKey] and (login is None and id is not None and exact_match is True and not kw and sort_by is None and max_results is None) and (self.REQUEST and self.REQUEST.environ.get(self.config[usernameHeaderKey]) == id):
             return [ {
                         "id": id,
                         "login": id,
@@ -89,13 +79,13 @@ class MultiPlugin(BasePlugin):
             return None
         else:
             membershipTool = getToolByName(self, 'portal_membership')
-            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin  # implicitly creates the record in portal_memberdata, at least when auto user creation is on: see memberdata.py:67
+            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin  # implicitly creates the record in portal_memberdata, at least when authenticate_everybody is on: see memberdata.py:67
             
-            if member is None:  # happens only when auto user creation is off
+            if member is None:  # happens only when authenticate_everybody is off
                 return None
             
             if str(member.getProperty('login_time')) == defaultDate:  # This member has never had his login time set; he's never logged in before.
-                setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when we first create the member. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen. The real answer is for somebody (Plone or PAS) to fire an event when somebody logs in.
+                setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when the member record is first created. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen. The real answer is for somebody (Plone or PAS) to fire an event when somebody logs in.
             membershipTool.createMemberArea(member_id=username)
             return username, username
 
@@ -140,7 +130,7 @@ class MultiPlugin(BasePlugin):
                 # HTTP_X_REMOTE_USER:
                 usernameHeaderKey: defaultUsernameHeader,
                 
-                autocreateUsersKey: True,
+                authenticateEverybodyKey: True,
             }
 
     # A method to return the configuration page:
@@ -162,18 +152,11 @@ class MultiPlugin(BasePlugin):
         """Update my configuration based on form data."""
         self.config[stripDomainNamesKey] = REQUEST.form.get(stripDomainNamesKey) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
         self.config[usernameHeaderKey] = REQUEST.form[usernameHeaderKey]
-        self.config[autocreateUsersKey] = REQUEST.form[autocreateUsersKey] == '1'
+        self.config[authenticateEverybodyKey] = REQUEST.form[authenticateEverybodyKey] == '1'
         self.config = self.config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
-    
-    
-    ## Utils: ############################
-    
-    def _userIdIsLoggedIn(self, userId, request):
-        """Return whether the user having ID `userId` is the user making the request `request`."""
-        return request and request.environ.get(self.config[usernameHeaderKey]) == userId
-    
 
-implementedInterfaces = [IRolesPlugin, IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin]
+
+implementedInterfaces = [IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin]
 classImplements(MultiPlugin, *implementedInterfaces)
 InitializeClass(MultiPlugin)  # Make the security declarations work.

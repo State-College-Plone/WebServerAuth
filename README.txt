@@ -19,8 +19,11 @@ Description
           the old products.
         
         * No longer does every user who has ever logged in clutter up your Users
-          and Groups control panel. Similarly, the Member role is now granted
-          dynamically.
+          and Groups control panel.
+        
+        * No longer grants all logged-in users the Member role. This means site
+          admins can opt to allow authentication of all users without giving them
+          any privileges.
         
         * Twiddles Plone's login link as necessary, reducing the need for
           manual configuration
@@ -36,7 +39,7 @@ Description
 
 Requirements
 
-    * Plone 3.0 or higher
+    * Plone 3.0 or higher (3.1.3 or higher, for #381?)
 
 
 Upgrading
@@ -80,8 +83,10 @@ Installation
                 # etc.
                 Require valid-user
             
-                # Put the username (stored below) into the HTTP_X_REMOTE_USER request header.
-                # This has to be in the <Location> block for some Apache auth modules, such as PubCookie, which don't set REMOTE_USER until very late.
+                # Put the username (stored below) into the HTTP_X_REMOTE_USER
+                # request header. This has to be in the <Location> block for
+                # some Apache auth modules, such as PubCookie, which don't set
+                # REMOTE_USER until very late.
                 RequestHeader set X_REMOTE_USER %{remoteUser}e
             </Location>
             
@@ -95,7 +100,9 @@ Installation
             
             RewriteEngine On
             
-            # Do the typical VirtualHostMonster rewrite, adding an E= option that puts the Apache-provided username into the remoteUser variable.
+            # Do the typical VirtualHostMonster rewrite, adding an E= option
+            # that puts the Apache-provided username into the remoteUser
+            # variable.
             RewriteRule ^/(.*)$ http://127.0.0.1:8080/VirtualHostBase/https/%{SERVER_NAME}:443/VirtualHostRoot/$1 [L,P,E=remoteUser:%{LA-U:REMOTE_USER}]
         </VirtualHost>
     
@@ -136,16 +143,21 @@ Configuration
     instance in the ZMI; it will be in '/your-plone-site/acl_users'. The
     configuration options are as follows:
         
-    Admit...
+    Recognize in Plone...
     
-        If you want to admit only a subset of the users your web server
-        recognizes, select "Only users made within Plone", and use the *Users
-        and Groups* page in *Site Setup* to create the users you want to admit.
-        Users you have not created will still be able to get past your web
-        server's login prompt but will not be recognized by Plone.
+        *Only users made within Plone.* If you want to authenticate only some
+        of the users your web server recognizes, select this option, and use
+        the *Users and Groups* page in *Site Setup* to create the users you
+        want to have recognized. Users you don't create will still be able to
+        get past your web server's login prompt but will not be recognized by
+        Plone. This option isn't recommended, because the UI is terrible:
+        people will log in and apparently succeed, only to be greeted with a
+        Plone page that still has a "Log In" link.
 
-        To admit everybody your web server admits, leave "Any user the web
-        server authenticates" selected.
+        *Any user the web server authenticates.* To recognize everybody your
+        web server recognize, leave this option selected. The downside of this
+        is that, if you have user folders enabled, anybody your web server
+        knows will be able to make one.
 
     Strip domain names from usernames
     

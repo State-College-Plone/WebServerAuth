@@ -6,22 +6,22 @@
 
 <form tal:define="config context/getConfig" method="post" action="manage_changeConfig">
     <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
-        <legend>Admit...</legend>
+        <legend>Recognize in Plone...</legend>
         <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
             <tr>
                 <td>
-                    <input type="radio" name="auto_create_users" id="auto_create_users_1" value="1" tal:attributes="checked config/auto_create_users" />
+                    <input type="radio" name="authenticate_everybody" id="authenticate_everybody_1" value="1" tal:attributes="checked config/authenticate_everybody" />
                 </td>
                 <td>
-                    <label for="auto_create_users_1">Any user the web server authenticates</label>
+                    <label for="authenticate_everybody_1">Any user the web server authenticates</label>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="radio" name="auto_create_users" id="auto_create_users_0" value="0" tal:attributes="checked not:config/auto_create_users" />
+                    <input type="radio" name="authenticate_everybody" id="authenticate_everybody_0" value="0" tal:attributes="checked not:config/authenticate_everybody" />
                 </td>
                 <td>
-                    <label for="auto_create_users_0">Only users made within Plone</label>
+                    <label for="authenticate_everybody_0">Only users made within Plone</label>
                 </td>
             </tr>
         </table>
