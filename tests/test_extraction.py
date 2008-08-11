@@ -1,7 +1,9 @@
+"""Unit tests for extraction plugin"""
+
 from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.utils import firstInstanceOfClass
-from Products.WebServerAuth.plugin import MultiPlugin, usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey, authenticateEverybodyKey
+from Products.WebServerAuth.plugin import MultiPlugin, usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey
 
 
 PloneTestCase.installProduct('WebServerAuth')
@@ -52,20 +54,6 @@ class TestExtraction(PloneTestCase.PloneTestCase):
             self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userAtDomain})
         finally:
             self.plugin.config[stripDomainNamesKey] = saveStrip
-    
-    def testNotMemberMaking(self):
-        """Assert we don't recognize nonexistent users unless we're configured to."""
-        self.app.REQUEST.set('PUBLISHED', self.portal)
-        self.app.REQUEST.set('PARENTS', [self.app])
-        self.app.REQUEST.steps = list(self.portal.getPhysicalPath())
-        self.app.REQUEST.environ['HTTP_X_REMOTE_USER'] = _username
-        
-        saveAdmit = self.plugin.config[authenticateEverybodyKey]
-        self.plugin.config[authenticateEverybodyKey] = False
-        try:
-            self.failUnlessEqual(getToolByName(self.portal, 'acl_users').validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
-        finally:
-            self.plugin.config[authenticateEverybodyKey] = saveAdmit
 
 
 def test_suite():
