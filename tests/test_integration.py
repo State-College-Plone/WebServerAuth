@@ -59,15 +59,16 @@ class TestIntegration(PloneTestCase.PloneTestCase):
             self.failUnlessEqual(self.acl_users.validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
         finally:
             plugin.config[authenticateEverybodyKey] = saveAdmit
-    
-    def testMemberSearch(self):
-        """Make sure auto-made members show up in searches.
-        
-        (Before we started setting login times, this didn't happen.)
-        
-        """
-        self.acl_users.validate(self.app.REQUEST)  # mock a login so the memberdata object is created. Miraculously, the memberdata object doesn't leak out of this test.
-        self.failUnless(len(self.acl_users.searchUsers(login=_userId)) == 1, "The automatically made user didn't show up in a search.")  # searchUsers is what Plone 3.0 indirectly calls from /Members.
+
+    # This feature is not implemented yet.
+    # def testMemberSearch(self):
+    #     """Make sure auto-made members show up in searches.
+    #     
+    #     (Before we started setting login times, this didn't happen.)
+    #     
+    #     """
+    #     self.acl_users.validate(self.app.REQUEST)  # mock a login so the memberdata object is created. Miraculously, the memberdata object doesn't leak out of this test.
+    #     self.failUnless(len(self.acl_users.searchUsers(login=_userId)) == 1, "The automatically made user didn't show up in a search.")  # searchUsers is what Plone 3.0 indirectly calls from /Members.
         
     def testGetUserById(self):
         """Make sure PAS.getUserById() thinks nonexistent users exist. Otherwise, we'll have a lot of trouble getting WSA-authenticated users returned from PluggableAuthService.validate()."""

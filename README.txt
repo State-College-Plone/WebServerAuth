@@ -21,9 +21,10 @@ Description
         * No longer does every user who has ever logged in clutter up your Users
           and Groups control panel.
         
-        * No longer grants all logged-in users the Member role. This means site
+        * Doesn't grant all logged-in users the Member role. This means site
           admins can opt to allow authentication of all users without giving them
-          any privileges.
+          any privileges. (Some default Plone workflows grant privileges to
+          Member.)
         
         * Twiddles Plone's login link as necessary, reducing the need for
           manual configuration
@@ -32,14 +33,15 @@ Description
         
         * Increases test coverage and does away with doctests
         
-        * Is unapologetically a Plone product: no more of the architectural
+        * Is unapologetically a Plone product: gone are the architectural
           compromises needed to support plain Zope use. This is why we can have
-          one product instead of two!
+          one product instead of two.
 
 
 Requirements
 
-    * Plone 3.0 or higher (3.1.3 or higher, for #381?)
+    * Plone 3.0 or maybe even 3.1.3 or higher. (If it works with 3.0, please let
+      me know.)
 
 
 Upgrading
@@ -111,7 +113,7 @@ Installation
        example, if you're using a single-sign-on system that provides its own
        logout page, point to that. If you can't think of anything better, make a
        page that says "Sorry, Bub. You'll have to quit your web browser to log
-       out", and point it at that.
+       out", and point it to that.
 
     5. Point the Change Password link (in the ZMI: your-plone-site &rarr;
        portal_controlpanel) to something sensible, or hide it altogether.
@@ -140,26 +142,28 @@ Configuration
     
     WebServerAuth ships with sensible defaults, so you probably won't need to
     configure it at all. But if you do, first navigate to your WebServerAuth
-    instance in the ZMI; it will be in '/your-plone-site/acl_users'. The
+    instance in the ZMI; it will be in 'your-plone-site/acl_users'. The
     configuration options are as follows:
         
     Make Plone recognize...
 
-        *Any user the web server authenticates.* To recognize everybody your
-        web server recognizes, leave this option selected. The downside of
-        this is that, if you have user folders enabled, anybody your web
-        server knows will be able to make one. However, this option is the
-        recommended one, because the UI is the most consistent (read on).
+        *Any user the web server authenticates.* To recognize everybody your web
+        server recognizes, leave this option selected. The downside of this is
+        that, if you have user folders enabled, anybody your web server knows
+        will be able to make one. However, this option is the recommended one,
+        because the UI is the most consistent (read on).
 
-        *Only users made within Plone.* If you want to authenticate only some
-        of the users your web server recognizes, select this option, and use
-        the *Users and Groups* page in *Site Setup* to create the users you
-        want to have recognized. Users you don't create will still be able to
-        get past your web server's login prompt but will not be recognized by
-        Plone. This option is discouraged, because the UI is terrible: people
-        will log in and apparently succeed, only to be greeted with a Plone
-        page that still has a "Log In" link. If somebody cares to donate
-        themes that fix this, I'm happy to include them.
+        *Only users made within Plone.* If you want to authenticate only some of
+        the users your web server recognizes, select this option, and use the
+        *Users and Groups* page in *Site Setup* to create the users you want to
+        have recognized. Users you don't create will still be able to get past
+        your web server's login prompt but will not be recognized by Plone. This
+        option is discouraged, because the UI is terrible: people will log in
+        and apparently succeed, only to be greeted with a Plone page that still
+        has a "Log In" link. However, it's the only way to have user folders and
+        yet not give them out to every Tom, Dick, and Harry your web server
+        recognizes. If somebody cares to donate themes that fix the UI, I'm
+        happy to include them.
 
     Strip domain names from usernames
     
@@ -196,10 +200,8 @@ Future Plans
     
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
-      they're created. With WebServerAuth, auto-created users show up in the
-      search after they've logged in at least once. Is this the best compromise
-      between technical constraints and UI consistency? Opinions from people who
-      actually use this search are most welcome.
+      they're created. With WebServerAuth, they never show up. Does anybody
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.0 if you do. Otherwise, I might not bother.
 
 
 Authorship
@@ -224,13 +226,12 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.0b1.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.0.
 
 
 Version History
     
-    ' ' 1.0b1 -- First release. Not quite feature-complete but should be stable
-                 and future-compatible.
+    ' ' 1.0 -- First release.
 
 
 License
