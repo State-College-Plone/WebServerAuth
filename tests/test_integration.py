@@ -66,7 +66,7 @@ class TestIntegration(PloneTestCase.PloneTestCase):
         (Before we started setting login times, this didn't happen.)
         
         """
-        import pdb;pdb.set_trace()
+        self.acl_users.validate(self.app.REQUEST)  # mock a login so the memberdata object is created. Miraculously, the memberdata object doesn't leak out of this test.
         self.failUnless(len(self.acl_users.searchUsers(login=_userId)) == 1, "The automatically made user didn't show up in a search.")  # searchUsers is what Plone 3.0 indirectly calls from /Members.
         
     def testGetUserById(self):
