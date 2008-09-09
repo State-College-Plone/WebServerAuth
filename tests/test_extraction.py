@@ -4,6 +4,7 @@ from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.utils import firstInstanceOfClass
 from Products.WebServerAuth.plugin import MultiPlugin, usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey
+from Products.WebServerAuth.tests.common import WebServerAuthTestCase
 
 
 PloneTestCase.installProduct('WebServerAuth')
@@ -18,9 +19,9 @@ class _MockRequest(object):
     def __init__(self, environ=None):
         self.environ = environ or {}
 
-class TestExtraction(PloneTestCase.PloneTestCase):
+class TestExtraction(WebServerAuthTestCase):
     def afterSetUp(self):
-        self.plugin = firstInstanceOfClass(getToolByName(self.portal, 'acl_users'), MultiPlugin)
+        self.plugin = self._plugin()
     
     def testDefaultExtraction(self):
         """Assert default behavior of extraction works."""

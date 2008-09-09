@@ -2,19 +2,17 @@ from Products.CMFCore.utils import getToolByName
 from Products.PloneTestCase import PloneTestCase
 from Products.WebServerAuth.utils import firstIdOfClass
 from Products.WebServerAuth.plugin import MultiPlugin, implementedInterfaces
+from Products.WebServerAuth.tests.common import WebServerAuthTestCase
 
 
 PloneTestCase.installProduct('WebServerAuth')
 PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 
-class InstallTestCase(PloneTestCase.PloneTestCase):
-    def afterSetUp(self):
-        self.acl_users = getToolByName(self.portal, 'acl_users')
-    
+class InstallTestCase(WebServerAuthTestCase):
     def installedMultipluginId(self):
         """Return the installed multiplugin or, if none is installed, None."""
-        return firstIdOfClass(self.acl_users, MultiPlugin)
+        return firstIdOfClass(self._acl_users(), MultiPlugin)
 
 
 class TestInstall(InstallTestCase):
@@ -23,7 +21,7 @@ class TestInstall(InstallTestCase):
         pluginId = self.installedMultipluginId()
         self.failUnless(pluginId, msg="Installation didn't put a WebServerAuth multiplugin instance into acl_users.")
         for interface in implementedInterfaces:
-            self.failUnless(pluginId in self.acl_users['plugins'].listPluginIds(interface), msg="Plugin wasn't activated on the %s interface." % interface.__name__)
+            self.failUnless(pluginId in self._acl_users()['plugins'].listPluginIds(interface), msg="Plugin wasn't activated on the %s interface." % interface.__name__)
 
 
 class TestUninstall(InstallTestCase):
