@@ -4,13 +4,14 @@ from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.plugin import MultiPlugin, authenticateEverybodyKey
 from Products.WebServerAuth.utils import firstInstanceOfClass
+from Products.WebServerAuth.tests.base import WebServerAuthTestCase
 
 PloneTestCase.installProduct('WebServerAuth')
 PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 _userId = 'fred'
 
-class TestIntegration(PloneTestCase.PloneTestCase):
+class TestIntegration(WebServerAuthTestCase):
     def afterSetUp(self):
         def getMockRequest():
             """Return a request that looks like we traversed to the root of the Plone site."""
@@ -25,7 +26,6 @@ class TestIntegration(PloneTestCase.PloneTestCase):
             return request
             
         self.logout()
-        self.acl_users = getToolByName(self.portal, 'acl_users')
         
         # Rig the REQUEST that looks like we traversed to the root of the Plone site:
         self.old_request = self.app.REQUEST
@@ -34,9 +34,6 @@ class TestIntegration(PloneTestCase.PloneTestCase):
     def beforeTearDown(self):
         self.app.REQUEST = self.old_request
     
-    def _plugin(self):
-        return firstInstanceOfClass(self.acl_users, MultiPlugin)
-    
     def testMemberFolderMaking(self):
         """Assert we make a member folder if that option in Plone is enabled."""
         membershipTool = getToolByName(self.portal, 'portal_membership')
@@ -44,7 +41,7 @@ class TestIntegration(PloneTestCase.PloneTestCase):
         if not folderCreationWasOn:
             membershipTool.setMemberareaCreationFlag()  # so we can test member-folder-making, which is off by default in Plone 3.0
         try:
-            self.acl_users.validate(self.app.REQUEST)  # Fire off the whole PAS stack so our unholy member-folder-making authentication plugin runs.
+            self._acl_users().validate(self.app.REQUEST)  # Fire off the whole PAS stack so our unholy member-folder-making authentication plugin runs.
         finally:  # Put things back as we found them.
             if not folderCreationWasOn:
                 membershipTool.setMemberareaCreationFlag()
@@ -56,7 +53,7 @@ class TestIntegration(PloneTestCase.PloneTestCase):
         saveAdmit = plugin.config[authenticateEverybodyKey]
         plugin.config[authenticateEverybodyKey] = False
         try:
-            self.failUnlessEqual(self.acl_users.validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
+            self.failUnlessEqual(self._acl_users().validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
         finally:
             plugin.config[authenticateEverybodyKey] = saveAdmit
 
@@ -72,7 +69,7 @@ class TestIntegration(PloneTestCase.PloneTestCase):
         
     def testGetUserById(self):
         """Make sure our enumerator makes PAS.getUserById() believe nonexistent users exist. Otherwise, we'll have a lot of trouble getting WSA-authenticated users returned from PluggableAuthService.validate()."""
-        self.failIfEqual(self.acl_users.getUserById(_userId), None, msg="PAS.getUserById() isn't returning the web-server-dwelling user who is logged in.")
+        self.failIfEqual(self._acl_users().getUserById(_userId), None, msg="PAS.getUserById() isn't returning the web-server-dwelling user who is logged in.")
 
 #     def testEnumeration(self):
 #         """Make sure our PAS enumeration plugin spits out the users who have a member folder; that's better than nothing."""

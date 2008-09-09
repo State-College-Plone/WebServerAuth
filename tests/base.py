@@ -1,9 +1,9 @@
-"""Unit tests for authentication plugin"""
+"""A testing base class providing some common functionality"""
 
 from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.utils import firstInstanceOfClass
-from Products.WebServerAuth.plugin import MultiPlugin, usernameKey
+from Products.WebServerAuth.plugin import MultiPlugin
 
 
 class WebServerAuthTestCase(PloneTestCase.PloneTestCase):

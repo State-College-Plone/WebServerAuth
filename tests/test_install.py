@@ -2,7 +2,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.PloneTestCase import PloneTestCase
 from Products.WebServerAuth.utils import firstIdOfClass
 from Products.WebServerAuth.plugin import MultiPlugin, implementedInterfaces
-from Products.WebServerAuth.tests.common import WebServerAuthTestCase
+from Products.WebServerAuth.tests.base import WebServerAuthTestCase
 
 
 PloneTestCase.installProduct('WebServerAuth')
