@@ -71,9 +71,9 @@ class TestIntegration(PloneTestCase.PloneTestCase):
     #     self.failUnless(len(self.acl_users.searchUsers(login=_userId)) == 1, "The automatically made user didn't show up in a search.")  # searchUsers is what Plone 3.0 indirectly calls from /Members.
         
     def testGetUserById(self):
-        """Make sure PAS.getUserById() thinks nonexistent users exist. Otherwise, we'll have a lot of trouble getting WSA-authenticated users returned from PluggableAuthService.validate()."""
-        self.failIfEqual(self._plugin().getUserById(_userId), None, msg="PAS.getUserById() isn't returning the web-server-dwelling user who is logged in.")
-        
+        """Make sure our enumerator makes PAS.getUserById() believe nonexistent users exist. Otherwise, we'll have a lot of trouble getting WSA-authenticated users returned from PluggableAuthService.validate()."""
+        self.failIfEqual(self.acl_users.getUserById(_userId), None, msg="PAS.getUserById() isn't returning the web-server-dwelling user who is logged in.")
+
 #     def testEnumeration(self):
 #         """Make sure our PAS enumeration plugin spits out the users who have a member folder; that's better than nothing."""
 
