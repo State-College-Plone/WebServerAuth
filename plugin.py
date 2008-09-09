@@ -63,7 +63,7 @@ class MultiPlugin(BasePlugin):
     
         """
         defaultDate = '2000/01/01'
-        def setLoginTimes(username, member):
+        def setLoginTimes(member):
             """Do what the logged_in script usually does, with regard to login times, to users after they log in."""
             # Ripped off and simplified from CMFPlone.MembershipTool.MembershipTool.setLoginTimes():
             now = self.ZopeTime()
@@ -74,20 +74,23 @@ class MultiPlugin(BasePlugin):
                 lastLoginTime = now
             member.setMemberProperties({'login_time': now, 'last_login_time': lastLoginTime})
         
-        username = credentials.get(usernameKey)
-        if username is None:
+        login = credentials.get(usernameKey)
+        if login is None:
             return None
         else:
+            user = self._getPAS().getUser(login)  # Our enumerator doesn't respond to getUser() calls.
+            userId = user and user.getUserId() or login
+            
             membershipTool = getToolByName(self, 'portal_membership')
-            member = membershipTool.getMemberById(username)  # works thanks to our UserEnumerationPlugin  # implicitly creates the record in portal_memberdata, at least when authenticate_everybody is on: see memberdata.py:67
+            member = membershipTool.getMemberById(userId)  # works thanks to our UserEnumerationPlugin  # implicitly creates the record in portal_memberdata, at least when authenticate_everybody is on: see memberdata.py:67
             
             if member is None:  # happens only when authenticate_everybody is off
                 return None
             
             if str(member.getProperty('login_time')) == defaultDate:  # This member has never had his login time set; he's never logged in before.
-                setLoginTimes(username, member)  # lets the user show up in member searches. We do this only when the member record is first created. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen. The real answer is for somebody (Plone or PAS) to fire an event when somebody logs in.
-            membershipTool.createMemberArea(member_id=username)
-            return username, username
+                setLoginTimes(member)  # lets the user show up in member searches. We do this only when the member record is first created. This means the login times are less accurate than in a stock Plone with form-based login, in which the times are set at each login. However, if we were to set login times at each request, that's an expensive DB write at each, and lots of ConflictErrors happen. The real answer is for somebody (Plone or PAS) to fire an event when somebody logs in.
+            membershipTool.createMemberArea(member_id=userId)
+            return userId, login
 
     security.declarePrivate('extractCredentials')
     def extractCredentials(self, request):
