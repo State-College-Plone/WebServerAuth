@@ -7,6 +7,7 @@ from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
 from Products.WebServerAuth.utils import wwwDirectory
+import inspect
 
 # Keys for storing config:
 stripDomainNamesKey = 'strip_domain_names'
@@ -43,15 +44,20 @@ class MultiPlugin(BasePlugin):
         PAS doesn't seem to make an allowance for authorizing (IIRC) an existing user if that user cannot be enumerated, so we try to guess who's calling and make that happen.
         
         """
-        # Unless we're admitting non-Plone-dwelling users, don't pretend the user is there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user.
-        if self.config[authenticateEverybodyKey] and (login is None and id is not None and exact_match is True and not kw and sort_by is None and max_results is None) and (self.REQUEST and self.REQUEST.environ.get(self.config[usernameHeaderKey]) == id):
-            return [ {
-                        "id": id,
-                        "login": id,
-                        "pluginid": self.getId()
-                    } ]
-        else:
-            return []
+        # Unless we're admitting non-Plone-dwelling users, don't pretend the user is there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user. Heck, we even look at the stack now, because searchUsers() (as called by searchPrincipals()) calls us the same way getUserById() does.
+        if self.config[authenticateEverybodyKey] and (id is not None and login is None and exact_match is True and sort_by is None and max_results is None and not kw) and (self.REQUEST and self.REQUEST.environ.get(self.config[usernameHeaderKey]) == id):  # may be redundant with the stack inspection below, but it makes me feel warm and fuzzy for now
+            stack = inspect.stack()
+            try:
+                calledByGetUserById = stack[2][3] == 'getUserById'  # getUserById calls _verifyUser, which calls us
+            finally:
+                del stack  # Dispose of frames, as recommended by http://docs.python.org/lib/inspect-stack.html
+            if calledByGetUserById:
+                return [ {
+                            "id": id,
+                            "login": id,
+                            "pluginid": self.getId()
+                        } ]
+        return []
 
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):

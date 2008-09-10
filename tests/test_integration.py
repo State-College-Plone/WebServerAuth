@@ -70,6 +70,10 @@ class TestIntegration(WebServerAuthTestCase):
     def testGetUserById(self):
         """Make sure our enumerator makes PAS.getUserById() believe nonexistent users exist. Otherwise, we'll have a lot of trouble getting WSA-authenticated users returned from PluggableAuthService.validate()."""
         self.failIfEqual(self._acl_users().getUserById(_userId), None, msg="PAS.getUserById() isn't returning the web-server-dwelling user who is logged in.")
+    
+    def testSearchUsers(self):
+        """PAS.searchUsers() calls our enumerator exactly like getUserById(). Make sure our enumerator can distinguish."""
+        self.failIf(self._acl_users().searchUsers(**{'exact_match': True, 'id': _userId}), msg="WebServerAuth's enumeration plugin returned an item when called by searchUsers(). It shouldn't have.")
 
 #     def testEnumeration(self):
 #         """Make sure our PAS enumeration plugin spits out the users who have a member folder; that's better than nothing."""
