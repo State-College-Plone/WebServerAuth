@@ -1,11 +1,11 @@
 Description
 
-    WebServerAuth is a PAS multiplugin which allows Plone to delegate
-    authentication concerns to a web server like Apache or IIS. Using
-    WebServerAuth, Plone can be configured so any user known to your LDAP,
-    Kerberos, Shibboleth, or Pubcookie system&mdash;or any other system for
-    which your web server has an authentication module&mdash;can transparently
-    log in using enterprise-wide credentials.
+    WebServerAuth is a plugin which allows Plone to delegate authentication
+    concerns to a web server like Apache or IIS. Using WebServerAuth, Plone can
+    be configured so any user known to your LDAP, Kerberos, Shibboleth, or
+    Pubcookie system&mdash;or any other system for which your web server has an
+    authentication module&mdash;can transparently log in using enterprise-wide
+    credentials.
     
     WebServerAuth is intended to replace and improve upon apachepas and
     AutoMemberMakerPasPlugin, which come significantly and entirely,
@@ -136,7 +136,7 @@ Installation
        example, if you're using a single-sign-on system that provides its own
        logout page, point to that. If you can't think of anything better, make a
        page that says "Sorry, Bub. You'll have to quit your web browser to log
-       out", and point it to that.
+       out", and point it to that. 'string:${portal_url}/logged_out' may serve.
 
     5. Point the Change Password link (in the ZMI: your-plone-site &rarr;
        portal_controlpanel) to something sensible, or hide it altogether.
@@ -154,7 +154,7 @@ Troubleshooting
         header to Zope. If you are using Apache, make sure you included the
         <Proxy *> block above.
 
-    I can't access any of the acl_users screens, add users, or do anything useful in the Plone site, but it works with the root acl_users.
+    I can't access any of the acl_users screens, add users, or do anything useful in the Plone site, but I can get into the root-level acl_users just fine.
         
         If you have an existing user with the same ID as your user inside the
         Plone site, this will override your permission/role settings, so you
@@ -163,6 +163,13 @@ Troubleshooting
         Manager role, and log in with this user instead. Now the acl_users
         should behave normally again, and you should be able to change the
         settings.
+
+    Things act erratic when I use WebServerAuth to log in as a user that lives in the root-level acl_users folder.
+        
+        This isn't supported yet. (See
+        "ticket 124":https://weblion.psu.edu/trac/weblion/ticket/124 for
+        details.) You'll have to remember separate passwords for root-level
+        users for now.
 
 
 Configuration
@@ -258,7 +265,7 @@ Support
 
 Version History
     
-    ' ' 1.0 -- First release.
+    ' ' 1.0b1 -- First beta. No known bugs.
 
 
 License
