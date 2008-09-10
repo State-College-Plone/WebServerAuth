@@ -84,7 +84,7 @@ Upgrading
 
 Installation
 
-    1. Copy WebServerAuth to the 'Products' directory of your Zope instance.
+    1. Copy WebServerAuth to the Products directory of your Zope instance.
 
     2. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
        install WebServerAuth.
@@ -162,8 +162,8 @@ Configuration
     
     WebServerAuth ships with sensible defaults, so you probably won't need to
     configure it at all. But if you do, first navigate to your WebServerAuth
-    instance in the ZMI; it will be in 'your-plone-site/acl_users'. The
-    configuration options are as follows:
+    instance in the ZMI; it will be at your-plone-site &rarr; acl_users &rarr;
+    web_server_auth. The configuration options are as follows:
         
     Make Plone recognize...
 
