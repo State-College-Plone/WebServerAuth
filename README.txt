@@ -46,7 +46,7 @@ Requirements
 
 Upgrading
 
-    From apachepas and AutoMemberMakerPasPlugin
+    From apachepas and/or AutoMemberMakerPasPlugin
         
         1. Note your apachepas settings: in the ZMI, your-plone-site &rarr;
            acl_users &rarr; apachepas.
@@ -55,16 +55,36 @@ Upgrading
            and uninstall both apachepas and AutoMemberMakerPasPlugin. If you
            like, remove them from your Products folder as well.
         
-        3. Follow the installation instructions below.
+        3. Follow the installation instructions under *Installation*, then
+           return here.
         
         4. Visit the WebServerAuth configuration page (in the ZMI,
            your-plone-site &rarr; acl_users &rarr; web_server_auth), and restore
            the settings you used with apachepas.
+        
+        5. If you were using AutoMemberMakerPasPlugin, select *Any user the
+           web server authenticates*. (This is almost equivalent; see below.) If
+           not, select *Only users made within Plone*.
+        
+        6. Click "Save Changes".
+    
+    
+    An important change from AutoMemberMakerPasPlugin
+        
+        WebServerAuth does not grant users the Member role, only the Authorized
+        role (now that Plone supports that sort of thing without behaving
+        erratically). This gives you the power to treat
+        honest-to-goodness, explicitly endowed Members of your site differently
+        than any idiot who authenticates to your web server. However, if you are
+        upgrading from AutoMemberMakerPasPlugin, be sure to reexamine your
+        site's permissions and workflows. If you want the same behavior as
+        before, give Authorized users all the privileges that Members previously
+        had. If not, take this opportunity to differentiate the two roles.
 
 
 Installation
 
-    1. Copy WebServerAuth to your '$INSTANCE_HOME/Products' directory.
+    1. Copy WebServerAuth to the 'Products' directory of your Zope instance.
 
     2. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
        install WebServerAuth.
@@ -162,7 +182,7 @@ Configuration
         and apparently succeed, only to be greeted with a Plone page that still
         has a "Log In" link. However, it's the only way to have user folders and
         yet not give them out to every Tom, Dick, and Harry your web server
-        recognizes. If somebody cares to donate themes that fix the UI, I'm
+        recognizes. If somebody cares to donate themes that fix the UI, I'll be
         happy to include them.
 
     Strip domain names from usernames
@@ -238,7 +258,7 @@ License
 
     Copyright (c) 2008 The Pennsylvania State University. WebLion products are
     developed and maintained by the WebLion Project Team, its partners, and
-    members of the Penn State Zope Users Group.
+    members of the Penn State Plone Users Group.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
