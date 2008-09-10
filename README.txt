@@ -137,6 +137,10 @@ Installation
 
     5. Point the Change Password link (in the ZMI: your-plone-site &rarr;
        portal_controlpanel) to something sensible, or hide it altogether.
+    
+    6. Hide the Login portlet; it isn't meant to work with WebServerAuth. Your
+       visitors will try to use it, and they'll get confused when it doesn't
+       work. A future version of WebServerAuth will do this automatically.
 
 
 Troubleshooting
