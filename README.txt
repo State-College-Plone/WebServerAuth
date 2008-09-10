@@ -48,15 +48,17 @@ Upgrading
 
     From apachepas and/or AutoMemberMakerPasPlugin
         
-        1. Note your apachepas settings: in the ZMI, your-plone-site &rarr;
+        1. Follow the installation instructions under *Installation*, then
+           return here. (Installing WebServerAuth before removing the old
+           products will let you do the whole installation as a
+           web-server-authenticated user.)
+        
+        2. Note your apachepas settings: in the ZMI, your-plone-site &rarr;
            acl_users &rarr; apachepas.
         
-        2. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products,
+        3. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products,
            and uninstall both apachepas and AutoMemberMakerPasPlugin. If you
            like, remove them from your Products folder as well.
-        
-        3. Follow the installation instructions under *Installation*, then
-           return here.
         
         4. Visit the WebServerAuth configuration page (in the ZMI,
            your-plone-site &rarr; acl_users &rarr; web_server_auth), and restore
@@ -69,7 +71,7 @@ Upgrading
         6. Click "Save Changes".
     
     
-    An important change from AutoMemberMakerPasPlugin
+    A subtle but important change from AutoMemberMakerPasPlugin
         
         WebServerAuth does not grant users the Member role, only the
         Authenticated role (now that Plone supports that sort of thing without
