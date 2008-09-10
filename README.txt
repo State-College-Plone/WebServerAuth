@@ -71,15 +71,16 @@ Upgrading
     
     An important change from AutoMemberMakerPasPlugin
         
-        WebServerAuth does not grant users the Member role, only the Authorized
-        role (now that Plone supports that sort of thing without behaving
-        erratically). This gives you the power to treat
+        WebServerAuth does not grant users the Member role, only the
+        Authenticated role (now that Plone supports that sort of thing without
+        behaving erratically). This gives you the power to treat
         honest-to-goodness, explicitly endowed Members of your site differently
         than any idiot who authenticates to your web server. However, if you are
         upgrading from AutoMemberMakerPasPlugin, be sure to reexamine your
         site's permissions and workflows. If you want the same behavior as
-        before, give Authorized users all the privileges that Members previously
-        had. If not, take this opportunity to differentiate the two roles.
+        before, give Authenticated users all the privileges that Members
+        previously had. If not, take this opportunity to differentiate the two
+        roles.
 
 
 Installation
