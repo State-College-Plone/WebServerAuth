@@ -21,10 +21,13 @@ Description
         * No longer does every user who has ever logged in clutter up your Users
           and Groups control panel.
         
-        * Doesn't grant all logged-in users the Member role. This means site
-          admins can opt to allow authentication of all users without giving them
-          any privileges. (Some default Plone workflows grant privileges to
-          Member.)
+        * Grants all logged-in users the Authenticated role rather than the
+          Member role, allowing site admins to treat the two separately. (Plone
+          now supports this properly.) This means someone who authenticates to
+          your web server doesn't necessarily get any privileges in your Plone
+          site, making it safe to authenticate everyone; previously, when
+          everyone got the Member role, certain default Plone workflows would
+          grant them some capabilities.
         
         * Twiddles Plone's login link as necessary, reducing the need for
           manual configuration
@@ -265,6 +268,8 @@ Support
 
 Version History
     
+    ' ' 1.0 -- Polished the readme a bit. No code changes since 1.0b1.
+
     ' ' 1.0b1 -- First beta. No known bugs.
 
 
