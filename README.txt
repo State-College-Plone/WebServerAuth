@@ -1,13 +1,13 @@
 Description
 
-    WebServerAuth is a plugin which allows Plone to delegate authentication
-    concerns to a web server like Apache or IIS. Using WebServerAuth, Plone can
-    be configured so any user known to your LDAP, Kerberos, Shibboleth, or
-    Pubcookie system&mdash;or any other system for which your web server has an
+    WebServerAuth allows Plone to delegate authentication concerns to a web
+    server like Apache or IIS. Using WebServerAuth, Plone can be configured so
+    any user known to your LDAP, Kerberos, Shibboleth, or Pubcookie
+    system&mdash;or any other system for which your web server has an
     authentication module&mdash;can transparently log in using enterprise-wide
     credentials.
     
-    WebServerAuth is intended to replace and improve upon apachepas and
+    WebServerAuth obsoletes and improves upon apachepas and
     AutoMemberMakerPasPlugin, which come significantly and entirely,
     respectively, from the same author.
     
@@ -90,14 +90,21 @@ Upgrading
 
 Installation
 
-    1. Copy WebServerAuth to the Products directory of your Zope instance.
+    1. "Secure Zope":https://weblion.psu.edu/wiki/SecureZope against HTTP
+       requests from things other than Apache, because the following
+       configuration will make it accept whatever username comes in. Also secure
+       any intermediaries between Apache and Zope (Pound, Varnish, Squid, etc.)
+       from direct access, as they could also be used to inject a username.
+    
+    2. Copy WebServerAuth to the Products directory of your Zope instance.
 
-    2. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
+    3. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
        install WebServerAuth.
         
-    3. Have your web server always prompt for authentication on the HTTPS side.
-       Then, have it pass the username of the logged in user in a header. For
-       example, if you're using Apache, you might use something like this::
+    4. Have your web server always prompt for authentication on the HTTPS side.
+       Then, have it pass the username of the logged in user in a header (for
+       which you'll need the mod_headers module). For example, if you're using
+       Apache, you might use something like this::
        
         <VirtualHost *:443>
             ServerName www.example.com
@@ -134,17 +141,27 @@ Installation
             RewriteRule ^/(.*)$ http://127.0.0.1:8080/VirtualHostBase/https/%{SERVER_NAME}:443/VirtualHostRoot/$1 [L,P,E=remoteUser:%{LA-U:REMOTE_USER}]
         </VirtualHost>
     
-    4. Point Plone's Log Out link (in the ZMI: your-plone-site &rarr;
+    5. If you have a port-80 virtual host, be sure to clear out the
+       HTTP_X_REMOTE_USER header so end users can't pass arbitrary usernames
+       directly to the web server and masquerade as any user they like::
+       
+        <VirtualHost *:80>
+            ...
+            RequestHeader unset X_REMOTE_USER
+            ...
+        </VirtualHost>
+       
+    6. Point Plone's Log Out link (in the ZMI: your-plone-site &rarr;
        portal_actions &rarr; user &rarr; logout) to something sensible. For
        example, if you're using a single-sign-on system that provides its own
        logout page, point to that. If you can't think of anything better, make a
        page that says "Sorry, Bub. You'll have to quit your web browser to log
        out", and point it to that. 'string:${portal_url}/logged_out' may serve.
 
-    5. Point the Change Password link (in the ZMI: your-plone-site &rarr;
+    7. Point the Change Password link (in the ZMI: your-plone-site &rarr;
        portal_controlpanel) to something sensible, or hide it altogether.
     
-    6. Hide the Login portlet; it isn't meant to work with WebServerAuth. Your
+    8. Hide the Login portlet; it isn't meant to work with WebServerAuth. Your
        visitors will try to use it, and they'll get confused when it doesn't
        work. A future version of WebServerAuth will do this automatically.
 
@@ -268,6 +285,11 @@ Support
 
 Version History
     
+    ' ' unreleased -- ' '
+               
+               * Added even more instructions on setting up a secure Zope
+                 instance to the readme.
+
     ' ' 1.0 -- Polished the readme a bit. No code changes since 1.0b1.
 
     ' ' 1.0b1 -- First beta. No known bugs.
