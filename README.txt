@@ -287,8 +287,8 @@ Version History
     
     ' ' unreleased -- ' '
                
-               * Added even more instructions on setting up a secure Zope
-                 instance to the readme.
+        * Added even more instructions on setting up a secure Zope instance to
+          the readme.
 
     ' ' 1.0 -- Polished the readme a bit. No code changes since 1.0b1.
 

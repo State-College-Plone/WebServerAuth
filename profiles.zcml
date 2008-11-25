@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="wazzle.example">
+
+  <genericsetup:registerProfile
+      name="default"
+      title="Custom Theme"
+      directory="profiles/default"
+      description='Extension profile for the "Custom Theme" Plone theme.'
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+</configure>

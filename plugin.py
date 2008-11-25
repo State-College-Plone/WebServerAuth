@@ -152,8 +152,7 @@ class MultiPlugin(BasePlugin):
 
     security.declareProtected(ManageUsers, 'getConfig')
     def getConfig(self):
-        """Return a mapping of my configuration values, for use in a page
-        template."""
+        """Return a mapping of my configuration values, for use in a page template."""
         return self.config
 
     security.declareProtected(ManageUsers, 'manage_changeConfig')

@@ -2,6 +2,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.PluggableAuthService.interfaces.plugins import IChallengePlugin
 from Products.WebServerAuth.plugin import MultiPlugin, implementedInterfaces
 from Products.WebServerAuth.utils import firstIdOfClass
+from Products.WebServerAuth.portlets import LoginPortletRenderer
 
 
 def install(portal):
@@ -27,6 +28,13 @@ def install(portal):
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "python:request.ACTUAL_URL.replace('http://', 'https://', 1)")
     
+    # Hide the Login portlet:
+#     import pdb;pdb.set_trace()
+#     wsa_login_portlet = getMultiAdapter()
+#     sm = portal.getSiteManager()
+#     sm.registerAdapter(wsa_login_portlet, name='portlets.LoginThatNeverShowsUp')
+    
+    
 def uninstall(portal):
     # Delete the multiplugin instance:
     acl_users = getToolByName(portal, 'acl_users')
@@ -37,3 +45,7 @@ def uninstall(portal):
     # Revert login and logout links to their stock settings:
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "string:${portal_url}/login_form")
+    
+    # Put the Login portlet back how it was:
+    #sm = portal.getSiteManager()
+    #sm.unregisterAdapter(ILoginPortlet, name='portlets.Login')

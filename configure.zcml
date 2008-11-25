@@ -1,0 +1,16 @@
+<configure xmlns:plone="http://namespaces.plone.org/plone">
+
+<!-- 
+    <plone:portlet
+        name="portlets.LoginThatNeverShowsUp"
+        interface="plone.app.portlets.portlets.login.ILoginPortlet"
+        assignment="plone.app.portlets.portlets.login.Assignment"
+        renderer=".portlets.LoginPortletRenderer"
+        addview="plone.app.portlets.portlets.login.AddForm"
+        />
+ -->
+
+    <include package=".browser" />
+    <include file="profiles.zcml" />
+
+</configure>

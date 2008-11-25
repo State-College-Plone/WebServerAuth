@@ -1,0 +1,17 @@
+<configure xmlns:plone="http://namespaces.plone.org/plone">
+
+    <include package="plone.app.portlets" />
+    
+    <interface
+       interface=".interfaces.IWebServerAuthTheme"
+       type="zope.publisher.interfaces.browser.IBrowserSkinType"
+       name="WebServerAuth Theme"
+       />
+    
+    <plone:portletRenderer
+       portlet="plone.app.portlets.portlets.login.ILoginPortlet"
+       class=".portlets.LoginPortletRenderer"
+       layer=".interfaces.IWebServerAuthTheme"
+       />
+
+</configure>
