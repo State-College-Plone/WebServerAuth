@@ -4,7 +4,7 @@
 <h2 tal:define="form_title string:WebServerAuth Options"
     tal:replace="structure here/manage_form_title" />
 
-<form tal:define="config context/getConfig" method="post" action="manage_changeConfig">
+<form tal:define="config context/configForView" method="post" action="manage_changeConfig">
     <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
         <legend>Make Plone recognize...</legend>
         <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
@@ -22,6 +22,51 @@
                 </td>
                 <td>
                     <label for="authenticate_everybody_0">Only users made within Plone</label>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
+        <legend>To prompt the user for credentials, redirect...</legend>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
+            <tr valign="top">
+                <td>
+                    <input type="radio" name="use_custom_redirection" id="use_custom_redirection_0" value="0" tal:attributes="checked not:config/use_custom_redirection" />
+                </td>
+                <td>
+                    <label for="use_custom_redirection_0">To the HTTPS version of wherever he was going</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    <input type="radio" name="use_custom_redirection" id="use_custom_redirection_1" value="1" tal:attributes="checked config/use_custom_redirection" />
+                </td>
+                <td>
+                    <label for="use_custom_redirection_1">To a custom URL:</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                </td>
+                <td>
+                    <table border="0" cellspacing="0" cellpadding="2">
+                        <tr>
+                            <td align="right">
+                                <label for="challenge_pattern">Matching pattern:</label>
+                            </td>
+                            <td>
+                                <input name="challenge_pattern" id="challenge_pattern" type="text" size="40" tal:attributes="value config/challenge_pattern_uncompiled" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <label for="challenge_replacement">Replacement pattern:</label>
+                            </td>
+                            <td>
+                                <input name="challenge_replacement" id="challenge_replacement" type="text" size="40" tal:attributes="value config/challenge_replacement" />
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>

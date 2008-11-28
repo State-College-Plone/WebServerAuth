@@ -3,7 +3,7 @@
 from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.utils import firstInstanceOfClass
-from Products.WebServerAuth.plugin import MultiPlugin, usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey
+from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
 
 

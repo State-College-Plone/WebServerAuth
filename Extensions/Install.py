@@ -23,7 +23,7 @@ def install(portal):
     for i in range(list(plugins.listPluginIds(IChallengePlugin)).index(id)):
         plugins.movePluginsUp(IChallengePlugin, [id])
     
-    # Set up login and logout links:
+    # Set up login link:
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "python:request.ACTUAL_URL.replace('http://', 'https://', 1)")
     
@@ -34,6 +34,6 @@ def uninstall(portal):
     if id:
         acl_users.manage_delObjects(ids=[id])  # implicitly deactivates
     
-    # Revert login and logout links to their stock settings:
+    # Revert login link to its stock setting:
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "string:${portal_url}/login_form")

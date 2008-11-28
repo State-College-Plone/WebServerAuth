@@ -1,3 +1,6 @@
+import inspect
+import logging
+import re
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Products.CMFCore.utils import getToolByName
@@ -7,17 +10,41 @@ from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
 from Products.WebServerAuth.utils import wwwDirectory
-import inspect
 
 # Keys for storing config:
 stripDomainNamesKey = 'strip_domain_names'
 usernameHeaderKey = 'username_header'
 authenticateEverybodyKey = 'authenticate_everybody'
+useCustomRedirectionKey = 'use_custom_redirection'
+challengePatternKey = 'challenge_pattern'
+challengeReplacementKey = 'challenge_replacement'
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
 
 defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
+_configDefaults = {
+        # It's useful to be able to turn this off for Shibboleth and
+        # other federated auth systems:
+        stripDomainNamesKey: True,
+        
+        # IISCosign insists on using HTTP_REMOTE_USER instead of
+        # HTTP_X_REMOTE_USER:
+        usernameHeaderKey: defaultUsernameHeader,
+        
+        authenticateEverybodyKey: True,
+    }
+_configDefaults1_1 = {
+        useCustomRedirectionKey: False,
+        challengePatternKey: re.compile('http://example.com/(.*)'),
+        challengeReplacementKey: r'https://secure.example.com/some-site/\1'
+    }
+_configDefaults.update(_configDefaults1_1)
+
+_defaultChallengePattern = re.compile('http://(.*)')
+_defaultChallengeReplacement = r'https://\1'
+
+logger = logging.getLogger('Products.WebServerAuth')
 
 
 class MultiPlugin(BasePlugin):
@@ -29,12 +56,21 @@ class MultiPlugin(BasePlugin):
     protocol = 'http'
     security.declarePrivate('challenge')
     def challenge(self, request, response):
-        if request.ACTUAL_URL.startswith('http://'):
-            # Let the web server auth have a swing at it:
-            response.redirect(request.ACTUAL_URL.replace('http://', 'https://', 1), lock=True)
-            return True
-        else:  # There's nothing more we can do.
-            return False
+        pattern, replacement = self.config[useCustomRedirectionKey] and (self.config[challengePatternKey], self.config[challengeReplacementKey]) or (_defaultChallengePattern, _defaultChallengeReplacement)
+        match = pattern.match(request.ACTUAL_URL)
+        # Let the web server's auth have a swing at it:
+        if match:  # should always match an incoming HTTP-scheme URL, unless you screw up your pattern
+            try:
+                destination = match.expand(replacement)
+            except re.error:  # Don't screw up your replacement string, please. If you do, we at least try not to punish the user with a traceback.
+                logger.error("Your custom WebServerAuth Replacement Pattern could not be applied to a URL which needs authentication: %s. Please correct it." % request.ACTUAL_URL)
+            else:
+                response.redirect(destination, lock=True)
+                return True
+        else:
+            logger.error("Your custom WebServerAuth Matching Pattern did not match a URL which needs authentication: %s. Please correct it." % request.ACTUAL_URL)
+        # Our regex didn't match, or something went wrong. In any case, pass off control to the next challenge plugin.
+        return False
     
     security.declarePrivate('enumerateUsers')
     # Inspired by the OpenID plugin
@@ -123,6 +159,17 @@ class MultiPlugin(BasePlugin):
         return {usernameKey: username}
     
     
+    ## Helper methods: ############################
+    
+    @property
+    def config(self):
+        """Return the configuration mapping, in the latest format."""
+        if not hasattr(self, '_config'):  # we have a pre-1.1 config to upgrade
+            self._config = self.__dict__['config']  # sidestep descriptor
+            del self.__dict__['config']
+            self._config.update(_configDefaults1_1)
+        return self._config
+    
     ## ZMI crap: ############################
     
     def __init__(self, id, title=None):
@@ -130,17 +177,7 @@ class MultiPlugin(BasePlugin):
 
         self._setId(id)
         self.title = title
-        self.config = {
-                # It's useful to be able to turn this off for Shibboleth and
-                # other federated auth systems:
-                stripDomainNamesKey: True,
-                
-                # IISCosign insists on using HTTP_REMOTE_USER instead of
-                # HTTP_X_REMOTE_USER:
-                usernameHeaderKey: defaultUsernameHeader,
-                
-                authenticateEverybodyKey: True,
-            }
+        self._config = _configDefaults
 
     # A method to return the configuration page:
     security.declareProtected(ManageUsers, 'manage_config')
@@ -149,20 +186,24 @@ class MultiPlugin(BasePlugin):
     # Add a tab that calls that method:
     manage_options = ({'label': 'Options',
                        'action': 'manage_config'},) + BasePlugin.manage_options
-
-    security.declareProtected(ManageUsers, 'getConfig')
-    def getConfig(self):
-        """Return a mapping of my configuration values, for use in a page
-        template."""
-        return self.config
-
+    
+    security.declareProtected(ManageUsers, 'configForView')
+    def configForView(self):
+        """Return a mapping of my configuration values, for use in a page template."""
+        ret = self.config
+        ret['challenge_pattern_uncompiled'] = ret['challenge_pattern'].pattern
+        return ret
+    
     security.declareProtected(ManageUsers, 'manage_changeConfig')
     def manage_changeConfig(self, REQUEST=None):
         """Update my configuration based on form data."""
-        self.config[stripDomainNamesKey] = REQUEST.form.get(stripDomainNamesKey) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
-        self.config[usernameHeaderKey] = REQUEST.form[usernameHeaderKey]
-        self.config[authenticateEverybodyKey] = REQUEST.form[authenticateEverybodyKey] == '1'
-        self.config = self.config  # Makes ZODB know something changed.
+        for key in [stripDomainNamesKey, authenticateEverybodyKey, useCustomRedirectionKey]:
+            self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
+        for key in [usernameHeaderKey, challengeReplacementKey]:
+            self.config[key] = REQUEST.form[key]
+        self.config[challengePatternKey] = re.compile(REQUEST.form[challengePatternKey])
+        
+        self._config = self._config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
 
 
