@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<object name="portal_skins" meta_type="Plone Skins Tool">
-    <skin-path name="*">
-        <layer name="webserverauth_external_methods"/>
-    </skin-path>
-</object>
