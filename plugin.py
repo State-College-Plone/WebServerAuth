@@ -32,9 +32,10 @@ _configDefaults = {
         # HTTP_X_REMOTE_USER:
         usernameHeaderKey: defaultUsernameHeader,
         
-        authenticateEverybodyKey: True,
+        authenticateEverybodyKey: True
     }
 _configDefaults1_1 = {
+        # Config defaults new in version 1.1:
         useCustomRedirectionKey: False,
         challengePatternKey: re.compile('http://example.com/(.*)'),
         challengeReplacementKey: r'https://secure.example.com/some-site/\1'
@@ -53,6 +54,7 @@ class MultiPlugin(BasePlugin):
     
     ## PAS interface implementations: ############################
     
+    security.declarePublic('loginUrl')
     def loginUrl(self, currentUrl):
         """Given the URL of the page where the user presently is, return the URL which will prompt him for authentication and land him at the same place.
         
