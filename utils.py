@@ -1,8 +1,8 @@
 import os.path
 from Globals import package_home
-from Products.PluggableAuthService.interfaces import authservice
 
 wwwDirectory = os.path.join(package_home(globals()), 'www')
+pluginId = 'web_server_auth'
 
 def _firstIdAndInstanceOfClass(container, class_):
     """Return the ID and instance of the first object of class `class_` within `container`. If there is none, return (None, None)."""

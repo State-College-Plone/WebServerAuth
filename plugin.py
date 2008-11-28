@@ -53,24 +53,36 @@ class MultiPlugin(BasePlugin):
     
     ## PAS interface implementations: ############################
     
-    protocol = 'http'
-    security.declarePrivate('challenge')
-    def challenge(self, request, response):
+    def loginUrl(self, currentUrl):
+        """Given the URL of the page where the user presently is, return the URL which will prompt him for authentication and land him at the same place.
+        
+        If something goes wrong, return ''.
+        
+        """
         pattern, replacement = self.config[useCustomRedirectionKey] and (self.config[challengePatternKey], self.config[challengeReplacementKey]) or (_defaultChallengePattern, _defaultChallengeReplacement)
-        match = pattern.match(request.ACTUAL_URL)
+        match = pattern.match(currentUrl)
         # Let the web server's auth have a swing at it:
         if match:  # should always match an incoming HTTP-scheme URL, unless you screw up your pattern
             try:
                 destination = match.expand(replacement)
             except re.error:  # Don't screw up your replacement string, please. If you do, we at least try not to punish the user with a traceback.
-                logger.error("Your custom WebServerAuth Replacement Pattern could not be applied to a URL which needs authentication: %s. Please correct it." % request.ACTUAL_URL)
+                logger.error("Your custom WebServerAuth Replacement Pattern could not be applied to a URL which needs authentication: %s. Please correct it." % currentUrl)
             else:
-                response.redirect(destination, lock=True)
-                return True
+                return destination
         else:
-            logger.error("Your custom WebServerAuth Matching Pattern did not match a URL which needs authentication: %s. Please correct it." % request.ACTUAL_URL)
-        # Our regex didn't match, or something went wrong. In any case, pass off control to the next challenge plugin.
-        return False
+            logger.error("Your custom WebServerAuth Matching Pattern did not match a URL which needs authentication: %s. Please correct it." % currentUrl)
+        # Our regex didn't match, or something went wrong.
+        return ''
+    
+    protocol = 'http'
+    security.declarePrivate('challenge')
+    def challenge(self, request, response):
+        url = self.loginUrl(request.ACTUAL_URL)
+        if url:
+            response.redirect(url, lock=True)
+            return True
+        else:  # Pass off control to the next challenge plugin.
+            return False
     
     security.declarePrivate('enumerateUsers')
     # Inspired by the OpenID plugin

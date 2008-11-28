@@ -255,7 +255,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.0 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1 if you do. Otherwise, I might not bother.
 
 
 Authorship
@@ -280,12 +280,15 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.0.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.
 
 
 Version History
     
     ' ' unreleased -- ' '
+               
+               * Allow customization of where the challenge handler and login
+                 link send users.
                
                * Added even more instructions on setting up a secure Zope
                  instance to the readme.
