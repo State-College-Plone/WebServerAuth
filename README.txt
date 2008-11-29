@@ -49,6 +49,19 @@ Requirements
 
 Upgrading
 
+    From WebServerAuth 1.0
+    
+        1. Shut down Zope.
+        
+        2. Copy the new WebServerAuth to the Products directory of your Zope
+           instance.
+        
+        3. Start up Zope.
+        
+        4. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
+           reinstall WebServerAuth. (Your previous settings will be preserved.)
+    
+    
     From apachepas and/or AutoMemberMakerPasPlugin
         
         1. Follow the installation instructions under *Installation*, then
@@ -218,6 +231,23 @@ Configuration
         yet not give them out to every Tom, Dick, and Harry your web server
         recognizes. If somebody cares to donate themes that fix the UI, I'll be
         happy to include them.
+    
+    To prompt the user for credentials, redirect...
+    
+        *To the HTTPS version of wherever he was going.* When an anonymous user
+        tries to access _http://example.com/something-requiring-authentication_, redirect him to
+        _https://example.com/something-requiring-authentication_ (note the
+        "https").
+        
+        *To a custom URL.* If the above doesn't suit you, you can customize the
+        redirection behavior. In the *Matching pattern* box, enter a "regular
+        expression":http://en.wikipedia.org/wiki/Regular_expression which
+        matches every URL on your site and captures (using parentheses) the
+        parts you'll need when constructing the URL to redirect to. In the
+        *Replacement pattern* box, enter the URL to redirect to. Make sure it's
+        an HTTPS URL, and "use
+        backreferences":http://docs.python.org/library/re.html#re.sub (like \1,
+        \2, and so on) to substitute in the parts you captured above.
 
     Strip domain names from usernames
     
@@ -285,13 +315,13 @@ Support
 
 Version History
     
-    ' ' unreleased -- ' '
+    ' ' 1.1 -- ' '
                
-               * Allow customization of where the challenge handler and login
-                 link send users.
-               
-               * Added even more instructions on setting up a secure Zope
-                 instance to the readme.
+        * Provided for customization of where the challenge handler and login
+          link send users.
+        
+        * Added even more instructions on setting up a secure Zope
+          instance to the readme.
 
     ' ' 1.0 -- Polished the readme a bit. No code changes since 1.0b1.
 

@@ -55,7 +55,8 @@
                                 <label for="challenge_pattern">Matching pattern:</label>
                             </td>
                             <td>
-                                <input name="challenge_pattern" id="challenge_pattern" type="text" size="40" tal:attributes="value config/challenge_pattern_uncompiled" />
+                                <input name="challenge_pattern" id="challenge_pattern" type="text" size="40" tal:attributes="value config/challenge_pattern_uncompiled" /><br />
+                                <font size="-1"><a href="http://www.python.org/doc/2.5.2/lib/re-syntax.html" target="_blank">Regular expression reference</a></font>
                             </td>
                         </tr>
                         <tr>
