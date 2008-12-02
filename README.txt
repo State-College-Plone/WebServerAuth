@@ -288,7 +288,7 @@ Future Plans
       care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1 if you do. Otherwise, I might not bother.
 
 
-Authorship
+Author
 
     Erik Rose of the WebLion group at Penn State University
 
