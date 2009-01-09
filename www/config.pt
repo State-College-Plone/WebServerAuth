@@ -50,21 +50,29 @@
                 </td>
                 <td>
                     <table border="0" cellspacing="0" cellpadding="2">
-                        <tr>
+                        <tr valign="top">
                             <td align="right">
-                                <label for="challenge_pattern">Matching pattern:</label>
+                                <label for="challenge_pattern">Matching&nbsp;pattern:</label>
                             </td>
                             <td>
-                                <input name="challenge_pattern" id="challenge_pattern" type="text" size="40" tal:attributes="value config/challenge_pattern_uncompiled" /><br />
-                                <font size="-1"><a href="http://www.python.org/doc/2.5.2/lib/re-syntax.html" target="_blank">Regular expression reference</a></font>
+                                <input name="challenge_pattern" id="challenge_pattern" type="text" size="40" tal:attributes="value config/challenge_pattern_uncompiled" />
+                                <p class="form-help" style="margin: .5em 0">
+                                    <font size="-1">A regular expression matching every URL in your Plone site and capturing (using parentheses) the parts you'll need when constructing the replacement pattern.</font>
+                                </p>
+                                <p class="form-help" style="margin: .5em 0">
+                                    <font size="-1"><a href="http://www.python.org/doc/2.5.2/lib/re-syntax.html" target="_blank">Regular expression reference</a></font>
+                                </p>
                             </td>
                         </tr>
-                        <tr>
+                        <tr valign="top">
                             <td align="right">
-                                <label for="challenge_replacement">Replacement pattern:</label>
+                                <label for="challenge_replacement">Replacement&nbsp;pattern:</label>
                             </td>
                             <td>
                                 <input name="challenge_replacement" id="challenge_replacement" type="text" size="40" tal:attributes="value config/challenge_replacement" />
+                                <p class="form-help" style="margin: .5em 0">
+                                    <font size="-1">The URL to redirect to. Make sure it's an HTTPS URL, and <a href="http://docs.python.org/library/re.html#re.sub">use backreferences</a> (like \1, \2, and so on) to substitute in the parts you captured above.</font>
+                                </p>
                             </td>
                         </tr>
                     </table>
