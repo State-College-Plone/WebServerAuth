@@ -61,18 +61,18 @@ class MultiPlugin(BasePlugin):
         If something goes wrong, return ''.
         
         """
-        pattern, replacement = self.config[useCustomRedirectionKey] and (self.config[challengePatternKey], self.config[challengeReplacementKey]) or (_defaultChallengePattern, _defaultChallengeReplacement)
+        usingCustomRedirection = self.config[useCustomRedirectionKey]
+        pattern, replacement = usingCustomRedirection and (self.config[challengePatternKey], self.config[challengeReplacementKey]) or (_defaultChallengePattern, _defaultChallengeReplacement)
         match = pattern.match(currentUrl)
         # Let the web server's auth have a swing at it:
-        if match:  # should always match an incoming HTTP-scheme URL, unless you screw up your pattern
+        if match:  # will usually start with http:// but may start with https:// (and thus not match) if you're already logged in and try to access something you're not privileged to
             try:
                 destination = match.expand(replacement)
             except re.error:  # Don't screw up your replacement string, please. If you do, we at least try not to punish the user with a traceback.
-                logger.error("Your custom WebServerAuth Replacement Pattern could not be applied to a URL which needs authentication: %s. Please correct it." % currentUrl)
+                if usingCustomRedirection:
+                    logger.error("Your custom WebServerAuth Replacement Pattern could not be applied to a URL which needs authentication: %s. Please correct it." % currentUrl)
             else:
                 return destination
-        else:
-            logger.error("Your custom WebServerAuth Matching Pattern did not match a URL which needs authentication: %s. Please correct it." % currentUrl)
         # Our regex didn't match, or something went wrong.
         return ''
     
