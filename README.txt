@@ -327,7 +327,7 @@ Version History
     
     ' ' 1.1.1 -- ' '
     
-        * Fixed "spurious &ldquo;Your custom WebSererAuth Matching Pattern did
+        * Fixed "spurious &ldquo;Your custom WebServerAuth Matching Pattern did
           not match&rdquo; error":https://weblion.psu.edu/trac/weblion/ticket/941
         
         * Added instructions to the config page.
