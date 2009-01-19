@@ -37,7 +37,7 @@ _configDefaults = {
 _configDefaults1_1 = {
         # Config defaults new in version 1.1:
         useCustomRedirectionKey: False,
-        challengePatternKey: re.compile('http://example.com/(.*)'),
+        challengePatternKey: re.compile(r'http://example\.com/(.*)'),
         challengeReplacementKey: r'https://secure.example.com/some-site/\1'
     }
 _configDefaults.update(_configDefaults1_1)

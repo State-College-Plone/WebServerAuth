@@ -325,6 +325,11 @@ Support
 
 Version History
     
+    ' ' 1.1.2 -- ' '
+    
+        * Made the example regex a little tighter; I'd forgot to backslash the
+          period.
+
     ' ' 1.1.1 -- ' '
     
         * Fixed "spurious &ldquo;Your custom WebServerAuth Matching Pattern did
