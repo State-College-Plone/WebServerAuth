@@ -95,7 +95,7 @@ class MultiPlugin(BasePlugin):
         
         """
         # Unless we're admitting non-Plone-dwelling users, don't pretend the user is there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user. Heck, we even look at the stack now, because searchUsers() (as called by searchPrincipals()) calls us the same way getUserById() does.
-        if self.config[authenticateEverybodyKey] and (id is not None and login is None and exact_match is True and sort_by is None and max_results is None and not kw) and (self.REQUEST and self._normalizedUsername(self.REQUEST.environ.get(self.config[usernameHeaderKey])) == id):  # may be redundant with the stack inspection below, but it makes me feel warm and fuzzy for now
+        if self.config[authenticateEverybodyKey] and (id is not None and login is None and exact_match is True and sort_by is None and max_results is None and not kw) and (self.REQUEST and self._normalizedLoginName(self.REQUEST.environ.get(self.config[usernameHeaderKey])) == id):  # may be redundant with the stack inspection below, but it makes me feel warm and fuzzy for now
             stack = inspect.stack()
             try:
                 calledByGetUserById = stack[2][3] == 'getUserById'  # getUserById calls _verifyUser, which calls us
@@ -111,7 +111,7 @@ class MultiPlugin(BasePlugin):
 
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
-        """Expects credentials in the format returned by extractCredentials() below.
+        """Expects a login name in the form returned by extractCredentials() below.
     
         Example:
           >>> authenticateCredentials({usernameKey: 'foobar'})
@@ -150,7 +150,7 @@ class MultiPlugin(BasePlugin):
 
     security.declarePrivate('extractCredentials')
     def extractCredentials(self, request):
-        """Get credentials from a request header passed into Zope.
+        """Get login name from a request header passed into Zope.
     
         Example:
           >>> class MockRequest:
@@ -164,21 +164,21 @@ class MultiPlugin(BasePlugin):
           {'apache_username': 'foobar'}
     
         """
-        username = request.environ.get(self.config[usernameHeaderKey])
-        if not username:
+        login = request.environ.get(self.config[usernameHeaderKey])
+        if not login:
             return None
-        return {usernameKey: self._normalizedUsername(username)}
+        return {usernameKey: self._normalizedLoginName(login)}
     
     
     ## Helper methods: ############################
     
-    security.declarePrivate('_normalizedUsername')
-    def _normalizedUsername(self, username):
-        """Given a raw username, return it modified according to the "Strip domain names from usernames" preference."""
-        if username is not None and self.config[stripDomainNamesKey] and '@' in username:
-            # With some setups, the username is returned as 'user123@some.domain.name'.
-            username = username.split('@', 1)[0]
-        return username
+    security.declarePrivate('_normalizedLoginName')
+    def _normalizedLoginName(self, login):
+        """Given a raw login name, return it modified according to the "Strip domain names from usernames" preference."""
+        if login is not None and self.config[stripDomainNamesKey] and '@' in login:
+            # With some setups, the login name is returned as 'user123@some.domain.name'.
+            login = login.split('@', 1)[0]
+        return login
     
     @property
     def config(self):

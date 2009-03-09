@@ -116,9 +116,10 @@ Installation
 
     1. "Secure Zope":https://weblion.psu.edu/wiki/SecureZope against HTTP
        requests from things other than Apache, because the following
-       configuration will make it accept whatever username comes in. Also secure
-       any intermediaries between Apache and Zope (Pound, Varnish, Squid, etc.)
-       from direct access, as they could also be used to inject a username.
+       configuration will make it accept whatever login name comes in. Also
+       secure any intermediaries between Apache and Zope (Pound, Varnish, Squid,
+       etc.) from direct access, as they could also be used to inject a login
+       name.
     
     2. Copy WebServerAuth to the Products directory of your Zope instance.
 
@@ -126,7 +127,7 @@ Installation
        install WebServerAuth.
         
     4. Have your web server always prompt for authentication on the HTTPS side.
-       Then, have it pass the username of the logged in user in a header (for
+       Then, have it pass the login name of the logged in user in a header (for
        which you'll need the mod_headers module). For example, if you're using
        Apache, you might use something like this::
        
@@ -142,7 +143,7 @@ Installation
                 # etc.
                 Require valid-user
             
-                # Put the username (stored below) into the HTTP_X_REMOTE_USER
+                # Put the login name (stored below) into the HTTP_X_REMOTE_USER
                 # request header. This has to be in the <Location> block for
                 # some Apache auth modules, such as PubCookie, which don't set
                 # REMOTE_USER until very late.
@@ -160,13 +161,13 @@ Installation
             RewriteEngine On
             
             # Do the typical VirtualHostMonster rewrite, adding an E= option
-            # that puts the Apache-provided username into the remoteUser
+            # that puts the Apache-provided login name into the remoteUser
             # variable.
             RewriteRule ^/(.*)$ http://127.0.0.1:8080/VirtualHostBase/https/%{SERVER_NAME}:443/VirtualHostRoot/$1 [L,P,E=remoteUser:%{LA-U:REMOTE_USER}]
         </VirtualHost>
     
     5. If you have a port-80 virtual host, be sure to clear out the
-       HTTP_X_REMOTE_USER header so end users can't pass arbitrary usernames
+       HTTP_X_REMOTE_USER header so end users can't pass arbitrary login names
        directly to the web server and masquerade as any user they like::
        
         <VirtualHost *:80>
@@ -192,7 +193,7 @@ Installation
 
 Troubleshooting
 
-    In Plone's navigation bar, "(null)" shows up instead of the username.
+    In Plone's navigation bar, "(null)" shows up instead of the login name.
     
         For some reason, the web server is not passing the HTTP_X_REMOTE_USER
         header to Zope. If you are using Apache, make sure you included the
@@ -214,6 +215,20 @@ Troubleshooting
         "ticket 124":https://weblion.psu.edu/trac/weblion/ticket/124 for
         details.) You'll have to remember separate passwords for root-level
         users for now.
+
+
+Use
+
+    Once your web server is happily passing an authenticated login name to Plone
+    via a request header, WebServerAuth kicks in and makes Plone consider that
+    user logged in. To grant privileges to such a web-server-authenticated
+    user...
+    
+        1. In Plone, create a user with the same login name. (The old
+           AutoMemberMaker product would automatically create Plone users. This
+           led to a profusion of uninteresting users in large organizations.)
+        
+        2. Assign privileges to that user as you normally would.
 
 
 Configuration
@@ -260,16 +275,26 @@ Configuration
         backreferences":http://docs.python.org/library/re.html#re.sub (like \1,
         \2, and so on) to substitute in the parts you captured above.
 
-    Strip domain names from usernames
+    Strip domain names from login names
     
-        If your web server includes a domain in the username, WebServerAuth
+        If your web server includes a domain in the login name, WebServerAuth
         will, by default, strip it off. For example, if the server sets
         X_REMOTE_USER to "fred@example.com", WebServerAuth will shorten it to
         "fred". If you don't want it to do this (for example, if you are using a
         cross-domain authorization system like Shibboleth where this could cause
-        name collisions), turn off "Strip domain names from usernames".
+        name collisions), turn off "Strip domain names from login names".
         
-    Username is in the such-and-such header
+        Note that Plone will not let you create a user with an @ or a period in
+        its login name. In order to assign privileges to a user with a domain in
+        its name...
+        
+            1. In Plone, create a user with a temporary name.
+            
+            2. In source_users (in the ZMI: your-plone-site &rarr; acl_users
+               &rarr; source_users), change the Login Name of the user to the
+               full, domain-having name.
+        
+    Login name is in the such-and-such header
     
         If, for some reason, you cannot use the default HTTP_X_REMOTE_USER
         header (for instance, if you are using IISCosign, which has

@@ -87,13 +87,13 @@
                 <input type="checkbox" id="strip_domain_names" name="strip_domain_names" value="1" tal:attributes="checked config/strip_domain_names" />
             </td>
             <td>
-                <label for="strip_domain_names">Strip domain names from usernames</label>
+                <label for="strip_domain_names">Strip domain names from login names</label>
             </td>
         </tr>
     </table>
     
     <p style="margin: 1em 0 0 0; padding: 0">
-        Username is in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.
+        Login name is in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.
     </p>
     
     <input type="submit" name="submit" value="Save Changes" style="margin: 1em 0 0 0" />
