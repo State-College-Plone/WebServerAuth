@@ -49,14 +49,15 @@ Requirements
 
 Upgrading
 
-    From WebServerAuth 1.1
+    From WebServerAuth 1.1.x
     
         1. Shut down Zope.
         
         2. Copy the new WebServerAuth to the Products directory of your Zope
            instance.
         
-        3. Start up Zope. (No reinstall is necessary.)
+        3. Start up Zope. (No reinstall is necessary, but you can do it if you
+           wish.)
         
 
     From WebServerAuth 1.0
@@ -295,7 +296,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.1 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.2 if you do. Otherwise, I might not bother.
 
 
 Author
@@ -320,13 +321,17 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.1.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.2.
 
 
 Version History
     
     ' ' 1.1.2 -- ' '
     
+        * Corrected "a bug":https://weblion.psu.edu/trac/weblion/ticket/1156
+          that kept users from being recognized when they had a domain in their
+          login name and domain stripping was on.
+        
         * Made the example regex a little tighter; I'd forgot to backslash the
           period.
 

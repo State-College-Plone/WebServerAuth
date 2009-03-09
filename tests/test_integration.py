@@ -50,6 +50,17 @@ class TestIntegration(MockRequestTestCase):
     def testSearchUsers(self):
         """PAS.searchUsers() calls our enumerator exactly like getUserById(). Make sure our enumerator can distinguish."""
         self.failIf(self._acl_users().searchUsers(exact_match=True, id=userId), msg="WebServerAuth's enumeration plugin returned an item when called by searchUsers(). It shouldn't have.")
+    
+    def testEnumerateUsernamesWithDomains(self):
+        """Make sure our wacky fake enumerator works with usernames@like.this."""
+        request = self.app.REQUEST
+        saveUserId = request.environ['HTTP_X_REMOTE_USER']
+        try:
+            request.environ['HTTP_X_REMOTE_USER'] = 'fred@fred.com'
+            user = self._acl_users().validate(request)
+            self.failUnless(user and user.getId() == 'fred', msg="Enumerator didn't dynamically manifest a user who had a domain in his name.")
+        finally:
+            request.environ['HTTP_X_REMOTE_USER'] = saveUserId
 
 #     def testEnumeration(self):
 #         """Make sure our PAS enumeration plugin spits out the users who have a member folder; that's better than nothing."""
