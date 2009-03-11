@@ -45,6 +45,9 @@ Requirements
 
     * Plone 3.0 or maybe even 3.1.3 or higher. (If it works with 3.0, please let
       me know.)
+    
+    * Also experimentally works without Plone, as long as you have
+      PluggableAuthService. I've tested with PluggableAuthService 1.4.
 
 
 Upgrading
@@ -359,6 +362,9 @@ Version History
         
         * Made the example regex a little tighter; I'd forgot to backslash the
           period.
+        
+        * Added experimental support for running on Zope without Plone. Works
+          with Zenoss 2.3.3, anyway.
 
     ' ' 1.1.1 -- ' '
     
