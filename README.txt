@@ -22,7 +22,7 @@ Description
           and Groups control panel.
         
         * Grants all logged-in users the Authenticated role rather than the
-          Member role, allowing site admins to treat the two separately. (Plone
+          Member role, allowing site admins to treat the two differently. (Plone
           now supports this properly.) This means someone who authenticates to
           your web server doesn't necessarily get any privileges in your Plone
           site, making it safe to authenticate everyone; previously, when
@@ -36,9 +36,7 @@ Description
         
         * Increases test coverage and does away with doctests
         
-        * Is unapologetically a Plone product: gone are the architectural
-          compromises needed to support plain Zope use. This is why we can have
-          one product instead of two.
+        * Is one product instead of two
 
 
 Requirements
@@ -47,7 +45,8 @@ Requirements
       me know.)
     
     * Also experimentally works without Plone, as long as you have
-      PluggableAuthService. I've tested with PluggableAuthService 1.4.
+      PluggableAuthService. I've tested with Zenoss 2.3.3, which means Zope
+      2.8.8 and PluggableAuthService 1.4.
 
 
 Upgrading
