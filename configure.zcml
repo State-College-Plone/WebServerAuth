@@ -1,0 +1,25 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="WebServerAuth">
+
+    <!-- Allow these profiles to be seen by GenericSetup so I can call setImportContext() on them in Install.py: -->
+    
+    <gs:registerProfile
+        name="default"
+        title="WebServerAuth"
+        directory="profiles/default"
+        description="Overrides login_form with a redirect to the actual login location."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot" />
+    
+    <gs:registerProfile
+        name="uninstall"
+        title="WebServerAuth Uninstall"
+        directory="profiles/uninstall"
+        description="Removes the login_form redirection."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot" />
+
+</configure>

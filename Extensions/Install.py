@@ -27,6 +27,10 @@ def install(portal, reinstall=False):
     user_actions = getToolByName(portal, 'portal_actions')['user']
     user_actions['login']._updateProperty('url_expr', "python:portal.acl_users.web_server_auth.loginUrl(request.ACTUAL_URL)")
     
+    # Override login_form with a redirect:
+    setupTool = getToolByName(portal, 'portal_setup')
+    setupTool.runAllImportStepsFromProfile('profile-Products.WebServerAuth:default')
+    
 def uninstall(portal, reinstall=False):
     if not reinstall:
         # Delete the multiplugin instance:
@@ -38,3 +42,7 @@ def uninstall(portal, reinstall=False):
         # Revert login link to its stock setting:
         user_actions = getToolByName(portal, 'portal_actions')['user']
         user_actions['login']._updateProperty('url_expr', "string:${portal_url}/login_form")
+    
+    # Remove login_form redirect:
+    setupTool = getToolByName(portal, 'portal_setup')
+    setupTool.runAllImportStepsFromProfile('profile-Products.WebServerAuth:uninstall')

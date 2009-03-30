@@ -353,6 +353,12 @@ Support
 
 Version History
     
+    ' ' 1.2 -- ' '
+    
+        * Added redirection of login_form so it logs you in using WebServerAuth.
+          Apparently, the default commenting setup comes with a "Log in to add
+          comments" button hard-coded to point to login_form. Blech!
+
     ' ' 1.1.2 -- ' '
     
         * Corrected "a bug":https://weblion.psu.edu/trac/weblion/ticket/1156
@@ -391,8 +397,8 @@ Version History
 
 License
 
-    Copyright (c) 2008 The Pennsylvania State University. WebLion products are
-    developed and maintained by the WebLion Project Team, its partners, and
+    Copyright (c) 2008-2009 The Pennsylvania State University. WebLion products
+    are developed and maintained by the WebLion Project Team, its partners, and
     members of the Penn State Plone Users Group.
 
     This program is free software; you can redistribute it and/or modify it

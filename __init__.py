@@ -10,6 +10,9 @@ except RuntimeError:
     # Don't explode upon re-registering the plugin:
     pass
 
+from Products.CMFCore.DirectoryView import registerDirectory
+
+registerDirectory('skins', globals())  # Without this, portal_skins/webserverauth shows up, but it's empty.
 
 def initialize(context):
     context.registerClass(MultiPlugin,
