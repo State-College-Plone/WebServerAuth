@@ -25,7 +25,7 @@ def install(portal, reinstall=False):
     
     # Set up login link:
     user_actions = getToolByName(portal, 'portal_actions')['user']
-    user_actions['login']._updateProperty('url_expr', "python:portal.acl_users.web_server_auth.loginUrl(request.ACTUAL_URL)")
+    user_actions['login']._updateProperty('url_expr', "python:here.acl_users.web_server_auth.loginUrl(request.ACTUAL_URL)")
     
     # Override login_form with a redirect:
     setupTool = getToolByName(portal, 'portal_setup')

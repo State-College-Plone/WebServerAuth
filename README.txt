@@ -358,6 +358,11 @@ Version History
         * Added redirection of login_form so it logs you in using WebServerAuth.
           Apparently, the default commenting setup comes with a "Log in to add
           comments" button hard-coded to point to login_form. Blech!
+        
+        * A call to the WebServerAuth PAS plugin is used to compute the login
+          link. Previously, it was hard-coded to use the portal-level acl_users
+          folder. Now it uses the nearest one, in case somebody is crazy enough
+          to define another.
 
     ' ' 1.1.2 -- ' '
     
