@@ -37,6 +37,8 @@ Description
         * Increases test coverage and does away with doctests
         
         * Is one product instead of two
+        
+        * Takes over the login_form so people can't log in wrong even if they try
 
 
 Requirements
