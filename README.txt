@@ -51,18 +51,7 @@ Requirements
 
 Upgrading
 
-    From WebServerAuth 1.1.x
-    
-        1. Shut down Zope.
-        
-        2. Copy the new WebServerAuth to the Products directory of your Zope
-           instance.
-        
-        3. Start up Zope. (No reinstall is necessary, but you can do it if you
-           wish.)
-        
-
-    From WebServerAuth 1.0
+    From WebServerAuth 1.1.x or 1.0
     
         1. Shut down Zope.
         
@@ -71,9 +60,9 @@ Upgrading
         
         3. Start up Zope.
         
-        4. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
-           reinstall WebServerAuth. (Your previous settings will be preserved.)
-    
+        4. Go to your-plone-site &rarr; site setup &rarr; Add-on Products, and
+           reinstall WebServerAuth. (Your settings will be preserved.)
+
     
     From apachepas and/or AutoMemberMakerPasPlugin
         
@@ -85,7 +74,7 @@ Upgrading
         2. Note your apachepas settings: in the ZMI, your-plone-site &rarr;
            acl_users &rarr; apachepas.
         
-        3. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products,
+        3. Go to your-plone-site &rarr; site setup &rarr; Add-on Products,
            and uninstall both apachepas and AutoMemberMakerPasPlugin. If you
            like, remove them from your Products folder as well.
         
@@ -125,7 +114,7 @@ Installation
     
     2. Copy WebServerAuth to the Products directory of your Zope instance.
 
-    3. Go to your-plone-site &rarr; site setup &rarr; Add/Remove Products, and
+    3. Go to your-plone-site &rarr; site setup &rarr; Add-on Products, and
        install WebServerAuth.
         
     4. Have your web server always prompt for authentication on the HTTPS side.
@@ -356,8 +345,8 @@ Version History
     ' ' 1.2 -- ' '
     
         * Added redirection of login_form so it logs you in using WebServerAuth.
-          Apparently, the default commenting setup comes with a "Log in to add
-          comments" button hard-coded to point to login_form. Blech!
+          Apparently, Plone's default commenting setup comes with a "Log in to
+          add comments" button hard-coded to point to login_form. Blech!
         
         * A call to the WebServerAuth PAS plugin is used to compute the login
           link. Previously, it was hard-coded to use the portal-level acl_users
