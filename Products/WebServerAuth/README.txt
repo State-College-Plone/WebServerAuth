@@ -119,7 +119,7 @@ Installation
        instance. Alternatively, add *Products.WebServerAuth* to your
        buildout.cfg like this and re-run buildout::
     
-        [buildout]
+        [instance]
         eggs =
             ...(other eggs)...
             Products.WebServerAuth
@@ -322,7 +322,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3.1 if you do. Otherwise, I might not bother.
 
 
 Author
@@ -347,11 +347,15 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3.1.
 
 
 Version History
     
+    ' ' 1.3.1 -- ' '
+    
+        * Corrected egg installation instructions in readme.
+
     ' ' 1.3 -- ' '
     
         * Repackaged as an egg so buildout users can install it more easily.
