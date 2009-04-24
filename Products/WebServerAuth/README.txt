@@ -53,12 +53,13 @@ Requirements
 
 Upgrading
 
-    From WebServerAuth 1.1.x or 1.0
+    From WebServerAuth 1.2, 1.1.x, or 1.0
     
         1. Shut down Zope.
         
-        2. Copy the new WebServerAuth to the Products directory of your Zope
-           instance.
+        2. Install the new WebServerAuth as described in the *Installation*
+           section below (either by copying it to your Products folder or by
+           running buildout).
         
         3. Start up Zope.
         
@@ -114,7 +115,14 @@ Installation
        etc.) from direct access, as they could also be used to inject a login
        name.
     
-    2. Copy WebServerAuth to the Products directory of your Zope instance.
+    2. Move the WebServerAuth folder into the Products folder of your Zope
+       instance. Alternatively, add *Products.WebServerAuth* to your
+       buildout.cfg like this and re-run buildout::
+    
+        [buildout]
+        eggs =
+            ...(other eggs)...
+            Products.WebServerAuth
 
     3. Go to your-plone-site &rarr; site setup &rarr; Add-on Products, and
        install WebServerAuth.
@@ -314,7 +322,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.2 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3 if you do. Otherwise, I might not bother.
 
 
 Author
@@ -339,11 +347,15 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.1.2.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3.
 
 
 Version History
     
+    ' ' 1.3 -- ' '
+    
+        * Repackaged as an egg so buildout users can install it more easily.
+
     ' ' 1.2 -- ' '
     
         * Added redirection of login_form so it logs you in using WebServerAuth.
