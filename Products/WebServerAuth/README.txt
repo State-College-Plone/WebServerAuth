@@ -1,44 +1,13 @@
 Description
 
-    WebServerAuth allows Plone to delegate authentication concerns to a web
-    server like Apache or IIS. Using WebServerAuth, Plone can be configured so
-    any user known to your LDAP, Kerberos, Shibboleth, or Pubcookie
-    system&mdash;or any other system for which your web server has an
-    authentication module&mdash;can transparently log in using enterprise-wide
-    credentials.
-    
-    WebServerAuth obsoletes and improves upon apachepas and
-    AutoMemberMakerPasPlugin, which come significantly and entirely,
-    respectively, from the same author.
-    
-    Improvements over apachepas and AutoMemberMakerPasPlugin
-    
-        * When an anonymous user tries to access something unpermitted,
-          we redirect him to the HTTPS side, which triggers a proper login
-          prompt. There are no more nonworking login forms popping up as in
-          the old products.
-        
-        * No longer does every user who has ever logged in clutter up your Users
-          and Groups control panel.
-        
-        * Grants all logged-in users the Authenticated role rather than the
-          Member role, allowing site admins to treat the two differently. (Plone
-          now supports this properly.) This means someone who authenticates to
-          your web server doesn't necessarily get any privileges in your Plone
-          site, making it safe to authenticate everyone; previously, when
-          everyone got the Member role, certain default Plone workflows would
-          grant them some capabilities.
-        
-        * Twiddles Plone's login link as necessary, reducing the need for
-          manual configuration
-        
-        * Jettisons a lot of legacy code and requirements
-        
-        * Increases test coverage and does away with doctests
-        
-        * Is one product instead of two
-        
-        * Takes over the login_form so people can't log in wrong even if they try
+    Authentication modules for web servers, like Apache or IIS, are more
+    plentiful than those for Zope and Plone. WebServerAuth lets you take
+    advantage of these in your site: just configure your web server to
+    authenticate the user and store his or her login name in a request header,
+    and WebServerAuth will convince Plone that that user is logged in.
+    WebServerAuth has been used with LDAP, Active Directory, Kerberos,
+    Shibboleth, Pubcookie, and CoSign and should work with anything else that
+    can put a username into a header.
 
 
 Requirements
@@ -46,7 +15,7 @@ Requirements
     * Plone 3.0 or maybe even 3.1.3 or higher. (If it works with 3.0, please let
       me know.)
     
-    * Also experimentally works without Plone, as long as you have
+    * Also experimentally works on Zope without Plone, as long as you have
       PluggableAuthService. I've tested with Zenoss 2.3.3, which means Zope
       2.8.8 and PluggableAuthService 1.4.
 
@@ -313,11 +282,47 @@ Configuration
         in here.
 
 
+Ancestry
+
+    WebServerAuth obsoletes and improves upon apachepas and
+    AutoMemberMakerPasPlugin, which come significantly and entirely,
+    respectively, from the same author.
+    
+    Improvements over apachepas and AutoMemberMakerPasPlugin
+    
+        * When an anonymous user tries to access something unpermitted,
+          we redirect him to the HTTPS side, which triggers a proper login
+          prompt. There are no more nonworking login forms popping up as in
+          the old products.
+        
+        * No longer does every user who has ever logged in clutter up your Users
+          and Groups control panel.
+        
+        * Grants all logged-in users the Authenticated role rather than the
+          Member role, allowing site admins to treat the two differently. (Plone
+          now supports this properly.) This means someone who authenticates to
+          your web server doesn't necessarily get any privileges in your Plone
+          site, making it safe to authenticate everyone; previously, when
+          everyone got the Member role, certain default Plone workflows would
+          grant them some capabilities.
+        
+        * Twiddles Plone's login link as necessary, reducing the need for
+          manual configuration
+        
+        * Jettisons a lot of legacy code and requirements
+        
+        * Increases test coverage and does away with doctests
+        
+        * Is one product instead of two
+        
+        * Takes over the login_form so people can't log in wrong even if they try
+
+
 Testing
 
     To run the WebServerAuth tests, use the standard Zope testrunner::
     
-        $INSTANCE_HOME/bin/zopectl test -pvvm Products.WebServerAuth
+        bin/instance test -pvvm Products.WebServerAuth
 
 
 Future Plans
@@ -332,7 +337,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3.1 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.4 if you do. Otherwise, I might not bother.
 
 
 Author
@@ -357,11 +362,15 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.3.1.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.4.
 
 
 Version History
     
+    ' ' 1.4 -- ' '
+    
+        * Added Windows domain stripping, thanks to Martin Aspeli.
+
     ' ' 1.3.1 -- ' '
     
         * Corrected egg installation instructions in readme.

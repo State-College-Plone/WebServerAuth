@@ -180,11 +180,12 @@ class MultiPlugin(BasePlugin):
     security.declarePrivate('_normalizedLoginName')
     def _normalizedLoginName(self, login):
         """Given a raw login name, return it modified according to the "Strip domain names from usernames" preference."""
-        if login is not None and self.config[stripDomainNamesKey] and '@' in login:
-            # With some setups, the login name is returned as 'user123@some.domain.name'.
-            login = login.split('@', 1)[0]
-        elif login is not None and self.config[stripWindowsDomainKey] and '\\' in login:
-            login = login.split('\\', 1)[1]
+        if login is not None:
+            if self.config[stripDomainNamesKey] and '@' in login:
+                # With some setups, the login name is returned as 'user123@some.domain.name'.
+                login = login.split('@', 1)[0]
+            elif self.config[stripWindowsDomainKey] and '\\' in login:
+                login = login.split('\\', 1)[1]
         return login
     
     @property
