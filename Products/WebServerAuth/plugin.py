@@ -13,6 +13,7 @@ from Products.WebServerAuth.utils import wwwDirectory
 
 # Keys for storing config:
 stripDomainNamesKey = 'strip_domain_names'
+stripWindowsDomainKey = 'strip_windows_domain'
 usernameHeaderKey = 'username_header'
 authenticateEverybodyKey = 'authenticate_everybody'
 useCustomRedirectionKey = 'use_custom_redirection'
@@ -27,6 +28,9 @@ _configDefaults = {
         # It's useful to be able to turn this off for Shibboleth and
         # other federated auth systems:
         stripDomainNamesKey: True,
+        
+        # For AD
+        stripWindowsDomainKey: False,
         
         # IISCosign insists on using HTTP_REMOTE_USER instead of
         # HTTP_X_REMOTE_USER:
@@ -179,6 +183,8 @@ class MultiPlugin(BasePlugin):
         if login is not None and self.config[stripDomainNamesKey] and '@' in login:
             # With some setups, the login name is returned as 'user123@some.domain.name'.
             login = login.split('@', 1)[0]
+        elif login is not None and self.config[stripWindowsDomainKey] and '\\' in login:
+            login = login.split('\\', 1)[1]
         return login
     
     @property
@@ -217,7 +223,7 @@ class MultiPlugin(BasePlugin):
     security.declareProtected(ManageUsers, 'manage_changeConfig')
     def manage_changeConfig(self, REQUEST=None):
         """Update my configuration based on form data."""
-        for key in [stripDomainNamesKey, authenticateEverybodyKey, useCustomRedirectionKey]:
+        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey]:
             self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
         for key in [usernameHeaderKey, challengeReplacementKey]:
             self.config[key] = REQUEST.form[key]

@@ -90,6 +90,14 @@
                 <label for="strip_domain_names">Strip domain names from login names</label>
             </td>
         </tr>
+        <tr valign="top">
+            <td>
+                <input type="checkbox" id="strip_windows_domain" name="strip_windows_domain" value="1" tal:attributes="checked config/strip_windows_domain" />
+            </td>
+            <td>
+                <label for="strip_windows_domain">Strip Windows/Active Directory domain from login names</label>
+            </td>
+        </tr>
     </table>
     
     <p style="margin: 1em 0 0 0; padding: 0">

@@ -294,6 +294,16 @@ Configuration
             2. In source_users (in the ZMI: your-plone-site &rarr; acl_users
                &rarr; source_users), change the Login Name of the user to the
                full, domain-having name.
+
+    Strip Windows/Active Directory domain from login names
+    
+        If your web server includes a Windows/Active Directory domain in the
+        login name, WebServerAuth will not, by default, strip it off. For
+        example, if the server sets X_REMOTE_USER to "EXAMPLE\fred",
+        WebServerAuth will pass this through unaltered. If you want to strip
+        off the domain and shorten it to "fred" (for example, if you are using
+        Active Directory and sAMAccountName as the user id name), turn on
+        "Strip Windows/Active Directory domain from login names".
         
     Login name is in the such-and-such header
     

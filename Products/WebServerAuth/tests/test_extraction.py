@@ -1,9 +1,7 @@
 """Unit tests for extraction plugin"""
 
 from Products.PloneTestCase import PloneTestCase
-from Products.CMFCore.utils import getToolByName
-from Products.WebServerAuth.utils import firstInstanceOfClass
-from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, usernameHeaderKey
+from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
 
 
@@ -14,6 +12,7 @@ PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 _username = 'someUsername'
 _domain = 'example.com'
 _userAtDomain = '%s@%s' % (_username, _domain)
+_userWinDomain = 'EXAMPLE\%s' % _username
 
 class _MockRequest(object):
     def __init__(self, environ=None):
@@ -55,8 +54,28 @@ class TestExtraction(WebServerAuthTestCase):
             self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userAtDomain})
         finally:
             self.plugin.config[stripDomainNamesKey] = saveStrip
-
-
+    
+    def testWinDomainStrippingOff(self):
+        """Assert choosing to not strip the domain off the end of a domain\user works."""
+        request = _MockRequest(environ={defaultUsernameHeader: _userWinDomain})
+        saveStrip = self.plugin.config[stripDomainNamesKey]
+        self.plugin.config[stripDomainNamesKey] = False
+        try:
+            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userWinDomain})
+        finally:
+            self.plugin.config[stripDomainNamesKey] = saveStrip
+    
+    def testWinDomainStrippingOn(self):
+        """Assert choosing to not strip the domain off the end of a domain\user works."""
+        request = _MockRequest(environ={defaultUsernameHeader: _userWinDomain})
+        saveStrip = self.plugin.config[stripWindowsDomainKey]
+        self.plugin.config[stripWindowsDomainKey] = True
+        try:
+            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
+        finally:
+            self.plugin.config[stripWindowsDomainKey] = saveStrip
+    
+            
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
