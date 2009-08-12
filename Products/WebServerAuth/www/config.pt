@@ -92,7 +92,7 @@
         </tr>
         <tr valign="top">
             <td>
-                <input type="checkbox" id="strip_windows_domain" name="strip_windows_domain" value="1" tal:attributes="checked config/strip_windows_domain" />
+                <input type="checkbox" id="strip_windows_domain" name="strip_windows_domain" value="1" tal:attributes="checked config/strip_windows_domain|nothing" />
             </td>
             <td>
                 <label for="strip_windows_domain">Strip Windows/Active Directory domain from login names</label>
