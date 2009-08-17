@@ -9,7 +9,7 @@ setup(
     name='Products.WebServerAuth',
     version=version,
     description="Delegates Plone's authentication concerns to a web server",
-    long_description="""WebServerAuth allows Plone to delegate authentication concerns to a web server like Apache or IIS. Using WebServerAuth, Plone can be configured so any user known to your LDAP, Kerberos, Shibboleth, or Pubcookie system (or any other system for which your web server has an authentication module) can transparently log in using enterprise-wide credentials.
+    long_description="""Authentication modules for web servers, like Apache or IIS, are more plentiful than those for Zope and Plone. WebServerAuth lets you take advantage of these in your site: just configure your web server to authenticate the user and store his or her login name in a request header, and WebServerAuth will convince Plone that that user is logged in. WebServerAuth has been used with LDAP, Active Directory, Kerberos, Shibboleth, Pubcookie, and CoSign and should work with anything else that can put a username into a header.
 
 `Read more at the WebServerAuth product page... <http://plone.org/products/webserverauth/>`_
 """,

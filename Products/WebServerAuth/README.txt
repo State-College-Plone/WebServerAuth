@@ -22,7 +22,7 @@ Requirements
 
 Upgrading
 
-    From WebServerAuth 1.2, 1.1.x, or 1.0
+    From an older version of WebServerAuth
     
         1. Shut down Zope.
         
@@ -210,69 +210,78 @@ Configuration
         
     Make Plone recognize...
 
-        *Any user the web server authenticates.* To recognize everybody your web
-        server recognizes, leave this option selected. The downside of this is
-        that, if you have user folders enabled, anybody your web server knows
-        will be able to make one. However, this option is the recommended one,
-        because the UI is the most consistent (read on).
+        Any user the web server authenticates
+        
+            To recognize everybody your web server recognizes, leave this option
+            selected. The downside of this is that, if you have user folders
+            enabled, anybody your web server knows will be able to make one.
+            However, this option is the recommended one, because the UI is the
+            most consistent (read on).
 
-        *Only users made within Plone.* If you want to authenticate only some of
-        the users your web server recognizes, select this option, and use the
-        *Users and Groups* page in *Site Setup* to create the users you want to
-        have recognized. Users you don't create will still be able to get past
-        your web server's login prompt but will not be recognized by Plone. This
-        option is discouraged, because the UI is terrible: people will log in
-        and apparently succeed, only to be greeted with a Plone page that still
-        has a "Log In" link. However, it's the only way to have user folders and
-        yet not give them out to every Tom, Dick, and Harry your web server
-        recognizes. If somebody cares to donate themes that fix the UI, I'll be
-        happy to include them.
+        Only users made within Plone
+        
+            If you want to authenticate only some of the users your web server
+            recognizes, select this option, and use the *Users and Groups* page
+            in *Site Setup* to create the users you want to have recognized.
+            Users you don't create will still be able to get past your web
+            server's login prompt but will not be recognized by Plone. This
+            option is discouraged, because the UI is terrible: people will log
+            in and apparently succeed, only to be greeted with a Plone page that
+            still has a "Log In" link. However, it's the only way to have user
+            folders and yet not give them out to every Tom, Dick, and Harry your
+            web server recognizes. If somebody cares to donate themes that fix
+            the UI, I'll be happy to include them.
     
     To prompt the user for credentials, redirect...
     
-        *To the HTTPS version of wherever he was going.* When an anonymous user
-        tries to access _http://example.com/something-requiring-authentication_, redirect him to
-        _https://example.com/something-requiring-authentication_ (note the
-        "https").
+        To the HTTPS version of wherever he was going
         
-        *To a custom URL.* If the above doesn't suit you, you can customize the
-        redirection behavior. In the *Matching pattern* box, enter a "regular
-        expression":http://en.wikipedia.org/wiki/Regular_expression which
-        matches every URL on your site and captures (using parentheses) the
-        parts you'll need when constructing the URL to redirect to. In the
-        *Replacement pattern* box, enter the URL to redirect to. Make sure it's
-        an HTTPS URL, and "use
-        backreferences":http://docs.python.org/library/re.html#re.sub (like \1,
-        \2, and so on) to substitute in the parts you captured above.
+            When an anonymous user tries to access
+            _http://example.com/something-requiring-authentication_, redirect
+            him to _https://example.com/something-requiring-authentication_
+            (note the "https").
+        
+        To a custom URL
+        
+            If the above doesn't suit you, you can customize the redirection
+            behavior. In the *Matching pattern* box, enter a "regular
+            expression":http://en.wikipedia.org/wiki/Regular_expression which
+            matches every URL on your site and captures (using parentheses) the
+            parts you'll need when constructing the URL to redirect to. In the
+            *Replacement pattern* box, enter the URL to redirect to. Make sure
+            it's an HTTPS URL, and "use
+            backreferences":http://docs.python.org/library/re.html#re.sub (like
+            \1, \2, and so on) to substitute in the parts you captured above.
 
-    Strip domain names from login names
+    Strip domains from login names
     
-        If your web server includes a domain in the login name, WebServerAuth
-        will, by default, strip it off. For example, if the server sets
-        X_REMOTE_USER to "fred@example.com", WebServerAuth will shorten it to
-        "fred". If you don't want it to do this (for example, if you are using a
-        cross-domain authorization system like Shibboleth where this could cause
-        name collisions), turn off "Strip domain names from login names".
+        Email-like domains
         
-        Note that Plone will not let you create a user with an @ or a period in
-        its login name. In order to assign privileges to a user with a domain in
-        its name...
-        
-            1. In Plone, create a user with a temporary name.
-            
-            2. In source_users (in the ZMI: your-plone-site &rarr; acl_users
-               &rarr; source_users), change the Login Name of the user to the
-               full, domain-having name.
+            If your web server returns a login name that looks like
+            fred@example.com, WebServerAuth will, by default, strip off
+            everything from the @ onward. If you don't want it to do this (for
+            example, if you are using a cross-domain authorization system like
+            Shibboleth where this could cause name collisions), turn off this
+            option.
 
-    Strip Windows/Active Directory domain from login names
+            Note that Plone will not let you create a user with an @ or a period
+            in its login name. In order to assign privileges to a user with a
+            domain in its name...
+
+                1. In Plone, create a user with a temporary name.
     
-        If your web server includes a Windows/Active Directory domain in the
-        login name, WebServerAuth will not, by default, strip it off. For
-        example, if the server sets X_REMOTE_USER to "EXAMPLE\fred",
-        WebServerAuth will pass this through unaltered. If you want to strip
-        off the domain and shorten it to "fred" (for example, if you are using
-        Active Directory and sAMAccountName as the user id name), turn on
-        "Strip Windows/Active Directory domain from login names".
+                2. In source_users (in the ZMI: your-plone-site &rarr; acl_users
+                   &rarr; source_users), change the Login Name of the user to
+                   the full, domain-having name.
+
+        Windows domains
+        
+            If your web server includes a Windows/Active Directory domain in the
+            login name, turn this on to strip it off. For example, if the server
+            sets HTTP_X_REMOTE_USER to "EXAMPLE\fred", turning this option on
+            will shorten it to "fred". This can be useful if you are using
+            Active Directory and sAMAccountName as the user id name, for
+            example.
         
     Login name is in the such-and-such header
     

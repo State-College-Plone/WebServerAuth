@@ -80,25 +80,33 @@
             </tr>
         </table>
     </fieldset>
-    
-    <table border="0" cellspacing="0" cellpadding="2" style="margin: 0; padding: 0">
-        <tr valign="top">
-            <td>
-                <input type="checkbox" id="strip_domain_names" name="strip_domain_names" value="1" tal:attributes="checked config/strip_domain_names" />
-            </td>
-            <td>
-                <label for="strip_domain_names">Strip domain names from login names</label>
-            </td>
-        </tr>
-        <tr valign="top">
-            <td>
-                <input type="checkbox" id="strip_windows_domain" name="strip_windows_domain" value="1" tal:attributes="checked config/strip_windows_domain|nothing" />
-            </td>
-            <td>
-                <label for="strip_windows_domain">Strip Windows/Active Directory domain from login names</label>
-            </td>
-        </tr>
-    </table>
+    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
+        <legend>Strip domains from login names:</legend>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
+            <tr valign="top">
+                <td>
+                    <input type="checkbox" id="strip_domain_names" name="strip_domain_names" value="1" tal:attributes="checked config/strip_domain_names" />
+                </td>
+                <td>
+                    <label for="strip_domain_names">
+                        Email-like domains<br />
+                        <span class="form-help">fred@example.com &rarr; fred</span>
+                    </label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    <input type="checkbox" id="strip_windows_domain" name="strip_windows_domain" value="1" tal:attributes="checked config/strip_windows_domain" />
+                </td>
+                <td>
+                    <label for="strip_windows_domain">
+                        Windows domains<br />
+                        <span class="form-help">EXAMPLE\fred &rarr; fred</span>
+                    </label>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
     
     <p style="margin: 1em 0 0 0; padding: 0">
         Login name is in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.

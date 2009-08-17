@@ -29,7 +29,7 @@ _configDefaults = {
         # other federated auth systems:
         stripDomainNamesKey: True,
         
-        # For AD
+        # For Active Directory:
         stripWindowsDomainKey: False,
         
         # IISCosign insists on using HTTP_REMOTE_USER instead of
@@ -39,7 +39,8 @@ _configDefaults = {
         authenticateEverybodyKey: True
     }
 _configDefaults1_1 = {
-        # Config defaults new in version 1.1:
+        # Config defaults new in version 1.1, when we migrated to a config
+        # property:
         useCustomRedirectionKey: False,
         challengePatternKey: re.compile(r'http://example\.com/(.*)'),
         challengeReplacementKey: r'https://secure.example.com/some-site/\1'
@@ -185,6 +186,7 @@ class MultiPlugin(BasePlugin):
                 # With some setups, the login name is returned as 'user123@some.domain.name'.
                 login = login.split('@', 1)[0]
             elif self.config[stripWindowsDomainKey] and '\\' in login:
+                # Active Directory user expressions have exactly 1 backslash.
                 login = login.split('\\', 1)[1]
         return login
     
@@ -195,6 +197,8 @@ class MultiPlugin(BasePlugin):
             self._config = self.__dict__['config']  # sidestep descriptor
             del self.__dict__['config']
             self._config.update(_configDefaults1_1)
+        if stripWindowsDomainKey not in self._config:
+            self._config[stripWindowsDomainKey] = _configDefaults[stripWindowsDomainKey]
         return self._config
     
     ## ZMI crap: ############################

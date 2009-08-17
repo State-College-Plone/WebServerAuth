@@ -45,35 +45,27 @@ class TestExtraction(WebServerAuthTestCase):
         finally:
             self.plugin.config[usernameHeaderKey] = saveHeader
     
-    def testDomainStripping(self):
-        """Assert choosing to not strip the domain off the end of a whatever@here.com username works."""
-        request = _MockRequest(environ={defaultUsernameHeader: _userAtDomain})
-        saveStrip = self.plugin.config[stripDomainNamesKey]
-        self.plugin.config[stripDomainNamesKey] = False
+    def _testDomainStripping(self, configKey, configSetting, incomingUsername, outgoingUsername):
+        """Set the `configKey` config setting to `configSetting`, and make sure the username `incomingUsername` is transformed to `outgoingUsername` upon extraction."""
+        request = _MockRequest(environ={defaultUsernameHeader: incomingUsername})
+        saveStrip = self.plugin.config[configKey]
+        self.plugin.config[configKey] = configSetting
         try:
-            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userAtDomain})
+            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: outgoingUsername})
         finally:
-            self.plugin.config[stripDomainNamesKey] = saveStrip
+            self.plugin.config[configKey] = saveStrip
+    
+    def testEmailDomainStripping(self):
+        """Assert choosing to not strip the domain off the end of a whatever@here.com username works."""
+        self._testDomainStripping(stripDomainNamesKey, False, _userAtDomain, _userAtDomain)
     
     def testWinDomainStrippingOff(self):
         """Assert choosing to not strip the domain off the end of a domain\user works."""
-        request = _MockRequest(environ={defaultUsernameHeader: _userWinDomain})
-        saveStrip = self.plugin.config[stripDomainNamesKey]
-        self.plugin.config[stripDomainNamesKey] = False
-        try:
-            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _userWinDomain})
-        finally:
-            self.plugin.config[stripDomainNamesKey] = saveStrip
+        self._testDomainStripping(stripWindowsDomainKey, False, _userWinDomain, _userWinDomain)
     
     def testWinDomainStrippingOn(self):
-        """Assert choosing to not strip the domain off the end of a domain\user works."""
-        request = _MockRequest(environ={defaultUsernameHeader: _userWinDomain})
-        saveStrip = self.plugin.config[stripWindowsDomainKey]
-        self.plugin.config[stripWindowsDomainKey] = True
-        try:
-            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
-        finally:
-            self.plugin.config[stripWindowsDomainKey] = saveStrip
+        """Assert choosing to strip the domain off the end of a domain\user works."""
+        self._testDomainStripping(stripWindowsDomainKey, True, _userWinDomain, _username)
     
             
 def test_suite():
