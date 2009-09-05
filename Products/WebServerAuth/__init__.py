@@ -1,11 +1,19 @@
 from AccessControl.Permissions import add_user_folders
 from Products.PluggableAuthService import registerMultiPlugin
 from Products.WebServerAuth.plugin import MultiPlugin
+from Products.WebServerAuth.realmgroup import RealmGroup
+from Products.WebServerAuth.realmgroup import RealmGroup
 from Products.WebServerAuth.utils import wwwDirectory
-from Products.WebServerAuth.zmi import manage_addWebServerAuthForm, manage_addWebServerAuth
+from Products.WebServerAuth.zmi import manage_addWebServerAuthForm, manage_addWebServerAuth, manage_addRealmGroupForm, manage_addRealmGroup
 
 try:
     registerMultiPlugin(MultiPlugin.meta_type)
+except RuntimeError:
+    # Don't explode upon re-registering the plugin:
+    pass
+
+try:
+    registerMultiPlugin(RealmGroup.meta_type)
 except RuntimeError:
     # Don't explode upon re-registering the plugin:
     pass
@@ -45,4 +53,11 @@ def initialize(context):
                                         manage_addWebServerAuth),
                           visibility=None,
                           icon='%s/multiplugin.gif' % wwwDirectory
-                         )
+                        )
+    context.registerClass(RealmGroup,
+                          permission=add_user_folders,
+                          constructors=(manage_addRealmGroupForm,
+                                        manage_addRealmGroup),
+                          visibility=None,
+                          icon='%s/multiplugin.gif' % wwwDirectory
+                        )
