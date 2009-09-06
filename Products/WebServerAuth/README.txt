@@ -289,7 +289,22 @@ Configuration
         header (for instance, if you are using IISCosign, which has
         "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
         in here.
-
+    
+    Check for the presence of a cookie
+    
+        In some situations, it is useful to be able to control whether the
+        user is logged in or not based on a cookie, even if the actual
+        authentication takes place outside Zope. For example, IIS can be
+        configured to use integrated Windows authentication, in which case
+        NTLM or Kerberos authentication will be used to set the
+        X-Remote-User header. However, you may not want your users to appear
+        logged in to Zope at all times, not at least because you can cache
+        content much more efficiently if everyone is anonymous.
+        
+        The solution is to use a custom view or something outside Zope to set
+        a cookie to indicate that the user should be logged in, and then
+        configure this field to check for the presence of that cookie. If
+        the cookie is absent, the user will not be authenticated.
 
 Ancestry
 

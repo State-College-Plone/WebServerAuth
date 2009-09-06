@@ -112,6 +112,11 @@
         Login name is in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.
     </p>
     
+    <p style="margin: 1em 0 0 0; padding: 0">
+        Check for the presence of a cookie with the name <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" />
+        before attempting to authenticate the user. Leave this blank to authenticate regardless of cookies.
+    </p>
+    
     <input type="submit" name="submit" value="Save Changes" style="margin: 1em 0 0 0" />
 </form>
 

@@ -7,6 +7,8 @@ from Products.WebServerAuth.plugin import MultiPlugin
 
 userId = 'fred'
 
+PloneTestCase.installProduct('WebServerAuth')
+PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 class WebServerAuthTestCase(PloneTestCase.PloneTestCase):
     def _acl_users(self):

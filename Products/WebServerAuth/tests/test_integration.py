@@ -1,13 +1,8 @@
 """Integration tests"""
 
-from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.plugin import authenticateEverybodyKey
-from Products.WebServerAuth.utils import firstInstanceOfClass
 from Products.WebServerAuth.tests.base import MockRequestTestCase, userId
-
-PloneTestCase.installProduct('WebServerAuth')
-PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 class TestIntegration(MockRequestTestCase):
     def testMemberFolderMaking(self):
@@ -16,22 +11,14 @@ class TestIntegration(MockRequestTestCase):
         folderCreationWasOn = membershipTool.getMemberareaCreationFlag()
         if not folderCreationWasOn:
             membershipTool.setMemberareaCreationFlag()  # so we can test member-folder-making, which is off by default in Plone 3.0
-        try:
-            self._acl_users().validate(self.app.REQUEST)  # Fire off the whole PAS stack so our unholy member-folder-making authentication plugin runs.
-        finally:  # Put things back as we found them.
-            if not folderCreationWasOn:
-                membershipTool.setMemberareaCreationFlag()
+        self._acl_users().validate(self.app.REQUEST)  # Fire off the whole PAS stack so our unholy member-folder-making authentication plugin runs.
         self.failUnless(membershipTool.getHomeFolder(userId), msg="Failed to make a member folder for the new user.")
     
     def testNotMemberMaking(self):
         """Assert we don't recognize nonexistent users unless we're configured to."""
         plugin = self._plugin()
-        saveAdmit = plugin.config[authenticateEverybodyKey]
         plugin.config[authenticateEverybodyKey] = False
-        try:
-            self.failUnlessEqual(self._acl_users().validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
-        finally:
-            plugin.config[authenticateEverybodyKey] = saveAdmit
+        self.failUnlessEqual(self._acl_users().validate(self.app.REQUEST), None, msg="Should fail but doesn't: Admitted a not-created-in-Plone user, even though I was configured not to.")
 
     # This feature is not implemented yet.
     # def testMemberSearch(self):
@@ -54,13 +41,10 @@ class TestIntegration(MockRequestTestCase):
     def testEnumerateUsernamesWithDomains(self):
         """Make sure our wacky fake enumerator works with usernames@like.this."""
         request = self.app.REQUEST
-        saveUserId = request.environ['HTTP_X_REMOTE_USER']
-        try:
-            request.environ['HTTP_X_REMOTE_USER'] = 'fred@fred.com'
-            user = self._acl_users().validate(request)
-            self.failUnless(user and user.getId() == 'fred', msg="Enumerator didn't dynamically manifest a user who had a domain in his name.")
-        finally:
-            request.environ['HTTP_X_REMOTE_USER'] = saveUserId
+        request.environ['HTTP_X_REMOTE_USER'] = 'fred@fred.com'
+        user = self._acl_users().validate(request)
+        self.failUnless(user and user.getId() == 'fred', msg="Enumerator didn't dynamically manifest a user who had a domain in his name.")
+        
 
 #     def testEnumeration(self):
 #         """Make sure our PAS enumeration plugin spits out the users who have a member folder; that's better than nothing."""
