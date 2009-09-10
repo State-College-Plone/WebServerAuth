@@ -1,12 +1,7 @@
 """Unit tests for extraction plugin"""
 
-from Products.PloneTestCase import PloneTestCase
 from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
-
-
-PloneTestCase.installProduct('WebServerAuth')
-PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 
 _username = 'someUsername'

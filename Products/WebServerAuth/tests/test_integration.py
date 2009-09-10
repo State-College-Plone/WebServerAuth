@@ -1,13 +1,9 @@
 """Integration tests"""
 
-from Products.PloneTestCase import PloneTestCase
 from Products.CMFCore.utils import getToolByName
 from Products.WebServerAuth.plugin import authenticateEverybodyKey
-from Products.WebServerAuth.utils import firstInstanceOfClass
 from Products.WebServerAuth.tests.base import MockRequestTestCase, userId
 
-PloneTestCase.installProduct('WebServerAuth')
-PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 class TestIntegration(MockRequestTestCase):
     def testMemberFolderMaking(self):

@@ -1,12 +1,8 @@
 """Unit tests for challenge plugin"""
 
 import re
-from Products.PloneTestCase import PloneTestCase
 from Products.WebServerAuth.plugin import useCustomRedirectionKey, challengePatternKey, challengeReplacementKey
 from Products.WebServerAuth.tests.base import MockRequestTestCase
-
-PloneTestCase.installProduct('WebServerAuth')
-PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 
 class ChallengeTestCase(MockRequestTestCase):
