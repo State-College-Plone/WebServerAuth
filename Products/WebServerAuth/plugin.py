@@ -19,7 +19,6 @@ authenticateEverybodyKey = 'authenticate_everybody'
 useCustomRedirectionKey = 'use_custom_redirection'
 challengePatternKey = 'challenge_pattern'
 challengeReplacementKey = 'challenge_replacement'
-cookieNameKey = 'cookie_name'
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -44,8 +43,7 @@ _configDefaults1_1 = {
         # property:
         useCustomRedirectionKey: False,
         challengePatternKey: re.compile(r'http://example\.com/(.*)'),
-        challengeReplacementKey: r'https://secure.example.com/some-site/\1',
-        cookieNameKey: None,
+        challengeReplacementKey: r'https://secure.example.com/some-site/\1'
     }
 _configDefaults.update(_configDefaults1_1)
 
@@ -172,14 +170,6 @@ class MultiPlugin(BasePlugin):
           {'apache_username': 'foobar'}
     
         """
-        
-        # Do not extract credentials if we are configured to expect a cookie,
-        # but it is not found.
-        cookieName = self.config.get(cookieNameKey, None)
-        if cookieName:
-            if not cookieName in request.cookies:
-                return None
-        
         login = request.environ.get(self.config[usernameHeaderKey])
         if not login:
             return None
@@ -209,8 +199,6 @@ class MultiPlugin(BasePlugin):
             self._config.update(_configDefaults1_1)
         if stripWindowsDomainKey not in self._config:
             self._config[stripWindowsDomainKey] = _configDefaults[stripWindowsDomainKey]
-        if cookieNameKey not in self._config:
-            self._config[cookieNameKey] = _configDefaults[cookieNameKey]
         return self._config
     
     ## ZMI crap: ############################
@@ -242,7 +230,7 @@ class MultiPlugin(BasePlugin):
         """Update my configuration based on form data."""
         for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey]:
             self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
-        for key in [usernameHeaderKey, challengeReplacementKey, cookieNameKey]:
+        for key in [usernameHeaderKey, challengeReplacementKey]:
             self.config[key] = REQUEST.form[key]
         self.config[challengePatternKey] = re.compile(REQUEST.form[challengePatternKey])
         

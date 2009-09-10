@@ -1,7 +1,14 @@
 """Unit tests for authentication plugin"""
 
+from Products.PloneTestCase import PloneTestCase
+from Products.CMFCore.utils import getToolByName
+from Products.WebServerAuth.utils import firstInstanceOfClass
 from Products.WebServerAuth.plugin import usernameKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
+
+
+PloneTestCase.installProduct('WebServerAuth')
+PloneTestCase.setupPloneSite(products=['WebServerAuth'])
 
 testLogin = 'guido'
 testUserId = 'someCrazyUserIdForGuido'

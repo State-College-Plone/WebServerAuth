@@ -1,7 +1,13 @@
 """Unit tests for extraction plugin"""
 
-from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, cookieNameKey
+from Products.PloneTestCase import PloneTestCase
+from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
+
+
+PloneTestCase.installProduct('WebServerAuth')
+PloneTestCase.setupPloneSite(products=['WebServerAuth'])
+
 
 _username = 'someUsername'
 _domain = 'example.com'
@@ -38,22 +44,6 @@ class TestExtraction(WebServerAuthTestCase):
             self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
         finally:
             self.plugin.config[usernameHeaderKey] = saveHeader
-    
-    def testCookieCheck(self):
-        """If configured to look for a cookie, check that we don't extract
-        crentials if the cookie is missing."""
-        
-        request = _MockRequest(environ={defaultUsernameHeader: _username})
-        request.cookies = {}
-        
-        old_value = self.plugin.config[cookieNameKey]
-        try:
-            self.plugin.config[cookieNameKey] = 'foo'
-            self.failUnless(self.plugin.extractCredentials(request) is None, msg="Found credentials to extract, even though we shouldn't have.")
-            request.cookies['foo'] = 'bar'
-            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
-        finally:
-            self.plugin.config[cookieNameKey] = old_value
     
     def _testDomainStripping(self, configKey, configSetting, incomingUsername, outgoingUsername):
         """Set the `configKey` config setting to `configSetting`, and make sure the username `incomingUsername` is transformed to `outgoingUsername` upon extraction."""
