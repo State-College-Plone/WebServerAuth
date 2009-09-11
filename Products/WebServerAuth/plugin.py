@@ -202,6 +202,7 @@ class MultiPlugin(BasePlugin):
             self._config[stripWindowsDomainKey] = _configDefaults[stripWindowsDomainKey]
         return self._config
     
+    
     ## ZMI crap: ############################
     
     def __init__(self, id, title=None):
@@ -222,7 +223,7 @@ class MultiPlugin(BasePlugin):
     security.declareProtected(ManageUsers, 'configForView')
     def configForView(self):
         """Return a mapping of my configuration values, for use in a page template."""
-        ret = self.config
+        ret = dict(self.config)
         ret['challenge_pattern_uncompiled'] = ret['challenge_pattern'].pattern
         return ret
     
