@@ -11,9 +11,6 @@ class TestAuthentication(WebServerAuthTestCase):
     def afterSetUp(self):
         self._source_users().addUser(testUserId, testLogin, 'password')
     
-    def beforeTearDown(self):
-        self._source_users().removeUser(testUserId)
-    
     def _source_users(self):
         """Return the default ZODBUserManager within the acl_users folder."""
         return self._acl_users()['source_users']

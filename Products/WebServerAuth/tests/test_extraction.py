@@ -33,22 +33,14 @@ class TestExtraction(WebServerAuthTestCase):
         """Assert the name of the header in which the username is passed can be changed."""
         alternateHeader = 'HTTP_REMOTE_USER'
         request = _MockRequest(environ={alternateHeader: _username})
-        saveHeader = self.plugin.config[usernameHeaderKey]
         self.plugin.config[usernameHeaderKey] = alternateHeader
-        try:
-            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
-        finally:
-            self.plugin.config[usernameHeaderKey] = saveHeader
+        self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
     
     def _testDomainStripping(self, configKey, configSetting, incomingUsername, outgoingUsername):
         """Set the `configKey` config setting to `configSetting`, and make sure the username `incomingUsername` is transformed to `outgoingUsername` upon extraction."""
         request = _MockRequest(environ={defaultUsernameHeader: incomingUsername})
-        saveStrip = self.plugin.config[configKey]
         self.plugin.config[configKey] = configSetting
-        try:
-            self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: outgoingUsername})
-        finally:
-            self.plugin.config[configKey] = saveStrip
+        self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: outgoingUsername})
     
     def testEmailDomainStripping(self):
         """Assert choosing to not strip the domain off the end of a whatever@here.com username works."""

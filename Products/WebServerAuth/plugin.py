@@ -1,3 +1,4 @@
+from persistent.dict import PersistentDict
 import inspect
 import logging
 import re
@@ -208,7 +209,7 @@ class MultiPlugin(BasePlugin):
 
         self._setId(id)
         self.title = title
-        self._config = _configDefaults
+        self._config = PersistentDict(_configDefaults)
 
     # A method to return the configuration page:
     security.declareProtected(ManageUsers, 'manage_config')
@@ -234,7 +235,6 @@ class MultiPlugin(BasePlugin):
             self.config[key] = REQUEST.form[key]
         self.config[challengePatternKey] = re.compile(REQUEST.form[challengePatternKey])
         
-        self._config = self._config  # Makes ZODB know something changed.
         return REQUEST.RESPONSE.redirect('%s/manage_config' % self.absolute_url())
 
 
