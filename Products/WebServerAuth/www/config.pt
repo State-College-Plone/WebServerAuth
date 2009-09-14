@@ -6,14 +6,14 @@
 
 <form tal:define="config context/configForView" method="post" action="manage_changeConfig">
     <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
-        <legend>Make Plone recognize...</legend>
+        <legend>Authenticate...</legend>
         <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
             <tr valign="top">
                 <td>
                     <input type="radio" name="authenticate_everybody" id="authenticate_everybody_1" value="1" tal:attributes="checked config/authenticate_everybody" />
                 </td>
                 <td>
-                    <label for="authenticate_everybody_1">Any user the web server authenticates (recommended)</label>
+                    <label for="authenticate_everybody_1">Any user the web server recognizes (recommended)</label>
                 </td>
             </tr>
             <tr valign="top">
@@ -21,7 +21,7 @@
                     <input type="radio" name="authenticate_everybody" id="authenticate_everybody_0" value="0" tal:attributes="checked not:config/authenticate_everybody" />
                 </td>
                 <td>
-                    <label for="authenticate_everybody_0">Only users made within Plone</label>
+                    <label for="authenticate_everybody_0">Only users with a corresponding Plone user</label>
                 </td>
             </tr>
         </table>
