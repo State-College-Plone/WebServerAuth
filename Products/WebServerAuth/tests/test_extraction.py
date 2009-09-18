@@ -1,17 +1,18 @@
 """Unit tests for extraction plugin"""
 
-from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey
+from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, cookieNameKey, cookieCheckEnabledKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
-
 
 _username = 'someUsername'
 _domain = 'example.com'
 _userAtDomain = '%s@%s' % (_username, _domain)
 _userWinDomain = 'EXAMPLE\%s' % _username
 
+
 class _MockRequest(object):
     def __init__(self, environ=None):
         self.environ = environ or {}
+
 
 class TestExtraction(WebServerAuthTestCase):
     def afterSetUp(self):
@@ -34,6 +35,20 @@ class TestExtraction(WebServerAuthTestCase):
         alternateHeader = 'HTTP_REMOTE_USER'
         request = _MockRequest(environ={alternateHeader: _username})
         self.plugin.config[usernameHeaderKey] = alternateHeader
+        self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
+    
+    def testCookieCheck(self):
+        """If configured to look for a cookie, check that we don't extract
+        crentials if the cookie is missing."""
+        
+        request = _MockRequest(environ={defaultUsernameHeader: _username})
+        request.cookies = {}
+        
+        self.plugin.config[cookieNameKey] = 'foo'
+        self.plugin.config[cookieCheckEnabledKey] = True
+        
+        self.failUnless(self.plugin.extractCredentials(request) is None, msg="Found credentials to extract, even though we shouldn't have.")
+        request.cookies['foo'] = 'bar'
         self.failUnlessEqual(self.plugin.extractCredentials(request), {usernameKey: _username})
     
     def _testDomainStripping(self, configKey, configSetting, incomingUsername, outgoingUsername):

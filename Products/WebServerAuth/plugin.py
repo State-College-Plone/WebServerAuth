@@ -20,6 +20,8 @@ authenticateEverybodyKey = 'authenticate_everybody'
 useCustomRedirectionKey = 'use_custom_redirection'
 challengePatternKey = 'challenge_pattern'
 challengeReplacementKey = 'challenge_replacement'
+cookieCheckEnabledKey = 'cookie_check_enabled'
+cookieNameKey = 'cookie_name'
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -47,6 +49,11 @@ _configDefaults1_1 = {
         challengeReplacementKey: r'https://secure.example.com/some-site/\1'
     }
 _configDefaults.update(_configDefaults1_1)
+_configDefaults1_5 = {
+        cookieNameKey: 'wsa_should_auth',
+        cookieCheckEnabledKey: False
+    }
+_configDefaults.update(_configDefaults1_5)
 
 _defaultChallengePattern = re.compile('http://(.*)')
 _defaultChallengeReplacement = r'https://\1'
@@ -171,6 +178,14 @@ class MultiPlugin(BasePlugin):
           {'apache_username': 'foobar'}
     
         """
+        
+        # Do not extract credentials if we are configured to expect a cookie
+        # but it is not found.
+        if self.config[cookieCheckEnabledKey]:
+            cookieName = self.config[cookieNameKey]
+            if cookieName and cookieName not in request.cookies:
+                return None
+        
         login = request.environ.get(self.config[usernameHeaderKey])
         if not login:
             return None
@@ -194,12 +209,21 @@ class MultiPlugin(BasePlugin):
     @property
     def config(self):
         """Return the configuration mapping, in the latest format."""
-        if not hasattr(self, '_config'):  # we have a pre-1.1 config to upgrade
+        # Upgrade config to version 1.1 format:
+        if not hasattr(self, '_config'):
             self._config = self.__dict__['config']  # sidestep descriptor
             del self.__dict__['config']
             self._config.update(_configDefaults1_1)
+        
+        # Upgrade to 1.4 format:
         if stripWindowsDomainKey not in self._config:
             self._config[stripWindowsDomainKey] = _configDefaults[stripWindowsDomainKey]
+        
+        # Upgrade to 1.5 format:
+        if not isinstance(self._config, PersistentDict):
+            self._config = PersistentDict(self._config)
+            self._config.update(_configDefaults1_5)
+        
         return self._config
     
     
@@ -230,9 +254,9 @@ class MultiPlugin(BasePlugin):
     security.declareProtected(ManageUsers, 'manage_changeConfig')
     def manage_changeConfig(self, REQUEST=None):
         """Update my configuration based on form data."""
-        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey]:
+        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey]:
             self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
-        for key in [usernameHeaderKey, challengeReplacementKey]:
+        for key in [usernameHeaderKey, challengeReplacementKey, cookieNameKey]:
             self.config[key] = REQUEST.form[key]
         self.config[challengePatternKey] = re.compile(REQUEST.form[challengePatternKey])
         

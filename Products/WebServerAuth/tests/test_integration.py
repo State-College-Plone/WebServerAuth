@@ -42,7 +42,6 @@ class TestIntegration(MockRequestTestCase):
     def testEnumerateUsernamesWithDomains(self):
         """Make sure our wacky fake enumerator works with usernames@like.this."""
         request = self.app.REQUEST
-        saveUserId = request.environ['HTTP_X_REMOTE_USER']
         request.environ['HTTP_X_REMOTE_USER'] = 'fred@fred.com'
         user = self._acl_users().validate(request)
         self.failUnless(user and user.getId() == 'fred', msg="Enumerator didn't dynamically manifest a user who had a domain in his name.")

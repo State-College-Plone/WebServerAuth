@@ -21,7 +21,15 @@
                     <input type="radio" name="authenticate_everybody" id="authenticate_everybody_0" value="0" tal:attributes="checked not:config/authenticate_everybody" />
                 </td>
                 <td>
-                    <label for="authenticate_everybody_0">Only users with a corresponding Plone user</label>
+                    <label for="authenticate_everybody_0">Only users with a pre-existing Plone account</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-top: 1em">
+                    <input type="checkbox" id="cookie_check_enabled" name="cookie_check_enabled" value="1" tal:attributes="checked config/cookie_check_enabled" />
+                </td>
+                <td style="padding-top: 1em">
+                   <label for="cookie_check_enabled">Only when the</label> <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" /> <label for="cookie_check_enabled">cookie is present</label>
                 </td>
             </tr>
         </table>

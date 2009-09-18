@@ -56,7 +56,7 @@ Upgrading
         
         5. If you were using AutoMemberMakerPasPlugin, select *Any user the
            web server authenticates*. (This is almost equivalent; see below.) If
-           not, select *Only users made within Plone*.
+           not, select *Only users with a pre-existing Plone account*.
         
         6. Click "Save Changes".
     
@@ -207,8 +207,8 @@ Configuration
     configure it at all. But if you do, first navigate to your WebServerAuth
     instance in the ZMI; it will be at your-plone-site &rarr; acl_users &rarr;
     web_server_auth. The configuration options are as follows:
-        
-    Make Plone recognize...
+    
+    Authenticate...
 
         Any user the web server authenticates
         
@@ -218,7 +218,7 @@ Configuration
             However, this option is the recommended one, because the UI is the
             most consistent (read on).
 
-        Only users made within Plone
+        Only users with a pre-existing Plone account
         
             If you want to authenticate only some of the users your web server
             recognizes, select this option, and use the *Users and Groups* page
@@ -289,6 +289,22 @@ Configuration
         header (for instance, if you are using IISCosign, which has
         "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
         in here.
+    
+    Only when the such-and-such cookie is present
+    
+        In some situations, it is useful to be able to control whether the
+        user is logged in or not based on a cookie, even if the actual
+        authentication takes place outside Zope. For example, IIS can be
+        configured to use integrated Windows authentication, in which case
+        NTLM or Kerberos authentication will be used to set the
+        X-Remote-User header. However, you may not want your users to appear
+        logged in to Zope at all times, for example because you can cache
+        content much more efficiently if everyone is anonymous.
+        
+        The solution is to use a custom view or something outside Zope to set
+        a cookie to indicate that the user should be logged in, and then
+        enable this option. If the cookie is absent, the user will not be
+        authenticated.
 
 
 Ancestry
@@ -346,7 +362,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.4 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.5 if you do. Otherwise, I might not bother.
 
 
 Author
@@ -354,13 +370,15 @@ Author
     Erik Rose of the WebLion group at Penn State University
 
 
-Thanks
+Thanks To...
 
-    Thanks to Rocky Burt, who wrote the pre-1.1 versions of apachepas, which,
-    along with my AutoMemberMakerPasPlugin, led to WebServerAuth.
+    * Rocky Burt, who wrote the pre-1.1 versions of apachepas, which, along with
+      my AutoMemberMakerPasPlugin, led to WebServerAuth.
 
-    Thanks to Mark James for the ZMI icon, available from
-    http://www.famfamfam.com/lab/icons/silk/.
+    * Mark James for the ZMI icon, available from
+      http://www.famfamfam.com/lab/icons/silk/.
+
+    * Martin Aspeli for his work on versions 1.4 and 1.5.
 
 
 Support
@@ -371,11 +389,27 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.4.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.5.
 
 
 Version History
     
+    ' ' 1.5 -- ' '
+    
+        * Added option to check for the presence of a cookie before
+          authenticating, which makes some Windows domain-based authentication
+          scenarios easier.
+
+        * Fixed a bug where configuration was accidentally shared
+          instance-wide. Having different configs in different Plone sites works
+          now.
+
+        * Refactored tests, which had been working around this bug.
+
+        * Fixed a bug where we were removing the wrong skin layer on uninstall.
+        
+        * Improved labeling on configuration page.
+
     ' ' 1.4 -- ' '
     
         * Added Windows domain stripping, thanks to Martin Aspeli.
