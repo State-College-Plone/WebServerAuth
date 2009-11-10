@@ -179,13 +179,6 @@ Troubleshooting
         should behave normally again, and you should be able to change the
         settings.
 
-    Things act erratic when I use WebServerAuth to log in as a user that lives in the root-level acl_users folder.
-        
-        This isn't supported yet. (See
-        "ticket 124":https://weblion.psu.edu/trac/weblion/ticket/124 for
-        details.) You'll have to remember separate passwords for root-level
-        users for now.
-
 
 Use
 
