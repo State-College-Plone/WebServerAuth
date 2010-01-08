@@ -10,6 +10,21 @@ Description
     can put a username into a header.
 
 
+Use
+
+    Once your web server is happily passing an authenticated login name to Plone
+    via a request header, WebServerAuth kicks in and makes Plone consider that
+    user logged in. To grant privileges to such a web-server-authenticated
+    user...
+    
+        1. In Plone, create a user with the same login name as he or she uses
+           to authenticate to the web server. (The old AutoMemberMaker product
+           would automatically create Plone users. This led to a profusion of
+           uninteresting users in large organizations.)
+        
+        2. Assign privileges to that user as you normally would.
+
+
 Requirements
 
     * Plone 3.0 or maybe even 3.1.3 or higher. (If it works with 3.0, please let
@@ -178,20 +193,6 @@ Troubleshooting
         Manager role, and log in with this user instead. Now the acl_users
         should behave normally again, and you should be able to change the
         settings.
-
-
-Use
-
-    Once your web server is happily passing an authenticated login name to Plone
-    via a request header, WebServerAuth kicks in and makes Plone consider that
-    user logged in. To grant privileges to such a web-server-authenticated
-    user...
-    
-        1. In Plone, create a user with the same login name. (The old
-           AutoMemberMaker product would automatically create Plone users. This
-           led to a profusion of uninteresting users in large organizations.)
-        
-        2. Assign privileges to that user as you normally would.
 
 
 Configuration
