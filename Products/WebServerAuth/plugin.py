@@ -1,62 +1,22 @@
-from persistent.dict import PersistentDict
 import inspect
 import logging
 import re
+
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
+from persistent.dict import PersistentDict
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin, IAuthenticationPlugin, IExtractionPlugin, IChallengePlugin
 from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
-from Products.WebServerAuth.utils import wwwDirectory
 
-# Keys for storing config:
-stripDomainNamesKey = 'strip_domain_names'
-stripWindowsDomainKey = 'strip_windows_domain'
-usernameHeaderKey = 'username_header'
-authenticateEverybodyKey = 'authenticate_everybody'
-useCustomRedirectionKey = 'use_custom_redirection'
-challengePatternKey = 'challenge_pattern'
-challengeReplacementKey = 'challenge_replacement'
-cookieCheckEnabledKey = 'cookie_check_enabled'
-cookieNameKey = 'cookie_name'
+from Products.WebServerAuth.utils import wwwDirectory
+from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
-
-defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
-_configDefaults = {
-        # It's useful to be able to turn this off for Shibboleth and
-        # other federated auth systems:
-        stripDomainNamesKey: True,
-        
-        # For Active Directory:
-        stripWindowsDomainKey: False,
-        
-        # IISCosign insists on using HTTP_REMOTE_USER instead of
-        # HTTP_X_REMOTE_USER:
-        usernameHeaderKey: defaultUsernameHeader,
-        
-        authenticateEverybodyKey: True
-    }
-_configDefaults1_1 = {
-        # Config defaults new in version 1.1, when we migrated to a config
-        # property:
-        useCustomRedirectionKey: False,
-        challengePatternKey: re.compile(r'http://example\.com/(.*)'),
-        challengeReplacementKey: r'https://secure.example.com/some-site/\1'
-    }
-_configDefaults.update(_configDefaults1_1)
-_configDefaults1_5 = {
-        cookieNameKey: 'wsa_should_auth',
-        cookieCheckEnabledKey: False
-    }
-_configDefaults.update(_configDefaults1_5)
-
-_defaultChallengePattern = re.compile('http://(.*)')
-_defaultChallengeReplacement = r'https://\1'
 
 logger = logging.getLogger('Products.WebServerAuth')
 
@@ -75,7 +35,7 @@ class MultiPlugin(BasePlugin):
         
         """
         usingCustomRedirection = self.config[useCustomRedirectionKey]
-        pattern, replacement = usingCustomRedirection and (self.config[challengePatternKey], self.config[challengeReplacementKey]) or (_defaultChallengePattern, _defaultChallengeReplacement)
+        pattern, replacement = usingCustomRedirection and (self.config[challengePatternKey], self.config[challengeReplacementKey]) or (defaultChallengePattern, defaultChallengeReplacement)
         match = pattern.match(currentUrl)
         # Let the web server's auth have a swing at it:
         if match:  # will usually start with http:// but may start with https:// (and thus not match) if you're already logged in and try to access something you're not privileged to
@@ -92,6 +52,11 @@ class MultiPlugin(BasePlugin):
     protocol = 'http'
     security.declarePrivate('challenge')
     def challenge(self, request, response):
+        config = self.config
+        if config[challengeHeaderEnabledKey]:
+            if request.get_header(config[challengeHeaderNameKey]) is None:
+                return False
+        
         url = self.loginUrl(request.ACTUAL_URL)
         if url:
             response.redirect(url, lock=True)
@@ -213,16 +178,20 @@ class MultiPlugin(BasePlugin):
         if not hasattr(self, '_config'):
             self._config = self.__dict__['config']  # sidestep descriptor
             del self.__dict__['config']
-            self._config.update(_configDefaults1_1)
+            self._config.update(configDefaults1_1)
         
         # Upgrade to 1.4 format:
         if stripWindowsDomainKey not in self._config:
-            self._config[stripWindowsDomainKey] = _configDefaults[stripWindowsDomainKey]
+            self._config[stripWindowsDomainKey] = configDefaults[stripWindowsDomainKey]
         
         # Upgrade to 1.5 format:
         if not isinstance(self._config, PersistentDict):
             self._config = PersistentDict(self._config)
-            self._config.update(_configDefaults1_5)
+            self._config.update(configDefaults1_5)
+        
+        # Upgrade to 1.6 format:
+        if challengeHeaderEnabledKey not in self._config:
+            self._config.update(configDefaults1_6)
         
         return self._config
     
@@ -234,7 +203,7 @@ class MultiPlugin(BasePlugin):
 
         self._setId(id)
         self.title = title
-        self._config = PersistentDict(_configDefaults)
+        self._config = PersistentDict(configDefaults)
 
     # A method to return the configuration page:
     security.declareProtected(ManageUsers, 'manage_config')
@@ -254,9 +223,9 @@ class MultiPlugin(BasePlugin):
     security.declareProtected(ManageUsers, 'manage_changeConfig')
     def manage_changeConfig(self, REQUEST=None):
         """Update my configuration based on form data."""
-        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey]:
+        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey, challengeHeaderEnabledKey]:
             self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
-        for key in [usernameHeaderKey, challengeReplacementKey, cookieNameKey]:
+        for key in [usernameHeaderKey, challengeReplacementKey, cookieNameKey, challengeHeaderNameKey]:
             self.config[key] = REQUEST.form[key]
         self.config[challengePatternKey] = re.compile(REQUEST.form[challengePatternKey])
         

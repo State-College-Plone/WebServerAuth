@@ -30,9 +30,10 @@ Requirements
     * Plone 3.0 or maybe even 3.1.3 or higher. (If it works with 3.0, please let
       me know.)
     
-    * Also experimentally works on Zope without Plone, as long as you have
-      PluggableAuthService. I've tested with Zenoss 2.3.3, which means Zope
-      2.8.8 and PluggableAuthService 1.4.
+    * Also works on Zope without Plone, as long as you have
+      PluggableAuthService. I've tested with Zenoss 2.3.3 and 2.5.0, which
+      suggests it works with Zope 2.8.8 or better and PluggableAuthService 1.4
+      or better.
 
 
 Upgrading

@@ -15,7 +15,7 @@ def install(portal, reinstall=False):
             constructors.manage_addWebServerAuth(id, title='WebServerAuth Plugin')
         
         # Activate it:
-        plugins = acl_users.plugins
+        plugins = acl_users['plugins']
         for interface in implementedInterfaces:
             plugins.activatePlugin(interface, id)  # plugins is a PluginRegistry
         
