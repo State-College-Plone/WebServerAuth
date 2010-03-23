@@ -21,7 +21,7 @@
                     <input type="radio" name="authenticate_everybody" id="authenticate_everybody_0" value="0" tal:attributes="checked not:config/authenticate_everybody" />
                 </td>
                 <td>
-                    <label for="authenticate_everybody_0">Only users with a pre-existing Plone account</label>
+                    <label for="authenticate_everybody_0">Only users with pre-existing Plone accounts</label>
                 </td>
             </tr>
             <tr valign="top">

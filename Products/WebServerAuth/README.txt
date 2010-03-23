@@ -76,7 +76,7 @@ Upgrading
         
         5. If you were using AutoMemberMakerPasPlugin, select *Any user the
            web server authenticates*. (This is almost equivalent; see below.) If
-           not, select *Only users with a pre-existing Plone account*.
+           not, select *Only users with pre-existing Plone accounts*.
         
         6. Click "Save Changes".
     
@@ -523,7 +523,7 @@ Version History
 
 License
 
-    Copyright (c) 2008-2009 The Pennsylvania State University. WebLion products
+    Copyright (c) 2008-2010 The Pennsylvania State University. WebLion products
     are developed and maintained by the WebLion Project Team, its partners, and
     members of the Penn State Plone Users Group.
 
