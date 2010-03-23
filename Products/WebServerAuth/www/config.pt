@@ -26,7 +26,7 @@
             </tr>
             <tr valign="top">
                 <td style="padding-top: 1em" colspan="2">
-                    Using the login name in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.
+                    Using the login name in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header
                 </td>
             </tr>
             <tr valign="top">
@@ -50,7 +50,7 @@
                 </td>
                 <td>
                     The <input type="text" size="20" name="secret_header" id="secret_header" tal:attributes="value config/secret_header" /> header contains the (shared secret) value 
-                    <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" />.
+                    <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" />
                 </td>
             </tr>
         </table>

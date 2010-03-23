@@ -317,7 +317,7 @@ Configuration
             that include strange explicit ports or setups that use a special
             login page rather than just any HTTPS-protocol request.
 
-    Strip domains from login names
+    Strip domains from login names containing...
     
         Email-like domains
         
@@ -445,8 +445,10 @@ Version History
           long, out of plugin.py.
           
         * Added shared secret support.  A header (HTTP_WSA_SECRET by default) can be
-          checked for an optional shared secret value.  When specfied, this value must
-          match the header value for credential extraction to take place.  
+          checked for an optional shared secret value.  When enabled and specfied, this
+          value must match the header value for credential extraction to take place.
+          
+        * Reworked the ZMI options page to be more consistent.
 
     ' ' 1.5 -- ' '
     
