@@ -14,6 +14,7 @@ cookieCheckEnabledKey = 'cookie_check_enabled'
 cookieNameKey = 'cookie_name'
 challengeHeaderEnabledKey = 'challenge_header_enabled'
 challengeHeaderNameKey = 'challenge_header_name'
+secretEnabledKey = 'secret_enabled'
 secretHeaderKey = 'secret_header'
 secretValueKey = 'secret_value'
 
@@ -57,7 +58,8 @@ configDefaults1_6 = {
     challengeHeaderEnabledKey: False,
     challengeHeaderNameKey: defaultChallengeHeader,
     secretHeaderKey: defaultSecretHeader,
-    secretValueKey: ''
+    secretValueKey: '',
+    secretEnabledKey: False
 }
 configDefaults.update(configDefaults1_6)
 

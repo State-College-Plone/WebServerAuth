@@ -230,22 +230,38 @@ Configuration
             folders and yet not give them out to every Tom, Dick, and Harry your
             web server recognizes. If somebody cares to donate themes that fix
             the UI, I'll be happy to include them.
-    
-        Only when the such-and-such cookie is present
         
-            In some situations, it is useful to be able to control whether the
-            user is logged in or not based on a cookie, even if the actual
-            authentication takes place outside Zope. For example, IIS can be
-            configured to use integrated Windows authentication, in which case
-            NTLM or Kerberos authentication will be used to set the
-            X-Remote-User header. However, you may not want your users to appear
-            logged in to Zope at all times, for example because you can cache
-            content much more efficiently if everyone is anonymous.
-
-            The solution is to use a custom view or something outside Zope to
-            set a cookie to indicate that the user should be logged in, and then
-            enable this option. If the cookie is absent, the user will not be
-            authenticated.
+        Using the login name in the such-and-such header
+    
+            If, for some reason, you cannot use the default HTTP_X_REMOTE_USER
+            header (for instance, if you are using IISCosign, which has
+            "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
+            in here.
+    
+        Only when...
+        
+            The such-and-such cookie is present
+        
+                In some situations, it is useful to be able to control whether the
+                user is logged in or not based on a cookie, even if the actual
+                authentication takes place outside Zope. For example, IIS can be
+                configured to use integrated Windows authentication, in which case
+                NTLM or Kerberos authentication will be used to set the
+                X-Remote-User header. However, you may not want your users to appear
+                logged in to Zope at all times, for example because you can cache
+                content much more efficiently if everyone is anonymous.
+    
+                The solution is to use a custom view or something outside Zope to
+                set a cookie to indicate that the user should be logged in, and then
+                enable this option. If the cookie is absent, the user will not be
+                authenticated.
+            
+            The such-and-such header contains the (shared secret) value this-and-that
+        
+                To protect against local forgery attacks a header (HTTP_WSA_SECRET by default)
+                may be required to contain a shared secret value before credential extraction
+                will take place.  If this option is enabled and the header does not contain the
+                shared secret value, the user will not be authenticated.
     
     To prompt the user for credentials, redirect...
     
@@ -330,20 +346,6 @@ Configuration
             will shorten it to "fred". This can be useful if you are using
             Active Directory and sAMAccountName as the user id name, for
             example.
-        
-    Login name is in the such-and-such header
-    
-        If, for some reason, you cannot use the default HTTP_X_REMOTE_USER
-        header (for instance, if you are using IISCosign, which has
-        "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
-        in here.
-        
-    Require a shared secret
-    
-        To protect against local forgery attacks a header (HTTP_WSA_SECRET by default)
-        may be required to contain a shared secret value before credential extraction
-        will take place.  If the shared secret value is left blank (the default), credential
-        extraction will occur normally.
 
 
 

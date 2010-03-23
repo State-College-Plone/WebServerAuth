@@ -13,7 +13,7 @@ from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
 
 from Products.WebServerAuth.utils import wwwDirectory
-from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader, secretHeaderKey, secretValueKey
+from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader, secretHeaderKey, secretValueKey, secretEnabledKey
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -151,8 +151,8 @@ class MultiPlugin(BasePlugin):
             if cookieName and cookieName not in request.cookies:
                 return None
             
-        # Do not extract credentials if a secret value is set, but not matched.
-        if self.config[secretValueKey]:
+        # Do not extract credentials if a secret matching is enabled, but not matched.
+        if self.config[secretEnabledKey]:
             secret = request.environ.get(self.config[secretHeaderKey])
             if secret != self.config[secretValueKey]:
                 return None
@@ -196,7 +196,7 @@ class MultiPlugin(BasePlugin):
             self._config.update(configDefaults1_5)
         
         # Upgrade to 1.6 format:
-        if challengeHeaderEnabledKey not in self._config or secretHeaderKey not in self._config:
+        if secretEnabledKey not in self._config:
             self._config.update(configDefaults1_6)
             
         return self._config
@@ -229,7 +229,7 @@ class MultiPlugin(BasePlugin):
     security.declareProtected(ManageUsers, 'manage_changeConfig')
     def manage_changeConfig(self, REQUEST=None):
         """Update my configuration based on form data."""
-        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey, challengeHeaderEnabledKey]:
+        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey, challengeHeaderEnabledKey, secretEnabledKey]:
             self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
         for key in [usernameHeaderKey, challengeReplacementKey, cookieNameKey, challengeHeaderNameKey, secretHeaderKey, secretValueKey]:
             self.config[key] = REQUEST.form[key]

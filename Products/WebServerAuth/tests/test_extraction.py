@@ -1,7 +1,7 @@
 """Unit tests for extraction plugin"""
 
 from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, cookieNameKey, cookieCheckEnabledKey
-from Products.WebServerAuth.config import defaultSecretHeader, secretValueKey
+from Products.WebServerAuth.config import defaultSecretHeader, secretValueKey, secretEnabledKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
 
 _username = 'someUsername'
@@ -54,13 +54,14 @@ class TestExtraction(WebServerAuthTestCase):
         
     def testSharedSecret(self):
         """If configured to look for a shared secret, check that we don't extract credentials if the secret does not match."""
-        
         secret = '123456'
+        
         badRequest = _MockRequest(environ={defaultUsernameHeader: _username})
         badRequest2 = _MockRequest(environ={defaultUsernameHeader: _username, defaultSecretHeader: secret + 'X'})
         goodRequest = _MockRequest(environ={defaultUsernameHeader: _username, defaultSecretHeader: secret})
         
         self.plugin.config[secretValueKey] = secret
+        self.plugin.config[secretEnabledKey] = True
         
         self.failUnless(self.plugin.extractCredentials(badRequest) is None, msg="Found credentials to extract, even though we shouldn't have.")
         self.failUnless(self.plugin.extractCredentials(badRequest2) is None, msg="Found credentials to extract, even though we shouldn't have.")

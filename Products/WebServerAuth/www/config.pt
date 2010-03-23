@@ -7,9 +7,9 @@
 <form tal:define="config context/configForView" method="post" action="manage_changeConfig">
     <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
         <legend>Authenticate...</legend>
-        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 0 2em">
             <tr valign="top">
-                <td>
+                <td style="margin-left: 2em">
                     <input type="radio" name="authenticate_everybody" id="authenticate_everybody_1" value="1" tal:attributes="checked config/authenticate_everybody" />
                 </td>
                 <td>
@@ -17,7 +17,7 @@
                 </td>
             </tr>
             <tr valign="top">
-                <td>
+                <td style="margin-left: 2em">
                     <input type="radio" name="authenticate_everybody" id="authenticate_everybody_0" value="0" tal:attributes="checked not:config/authenticate_everybody" />
                 </td>
                 <td>
@@ -25,11 +25,32 @@
                 </td>
             </tr>
             <tr valign="top">
-                <td style="padding-top: 1em">
+                <td style="padding-top: 1em" colspan="2">
+                    Using the login name in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-top: 1em" colspan="2">
+                Only when...
+                </td>
+            </tr>
+        </table>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
+            <tr valign="top">
+                <td style="padding-left: 2em">
                     <input type="checkbox" id="cookie_check_enabled" name="cookie_check_enabled" value="1" tal:attributes="checked config/cookie_check_enabled" />
                 </td>
-                <td style="padding-top: 1em">
-                   <label for="cookie_check_enabled">Only when the</label> <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" /> <label for="cookie_check_enabled">cookie is present</label>
+                <td>
+                   <label for="cookie_check_enabled">The</label> <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" /> <label for="cookie_check_enabled">cookie is present</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-left: 2em">
+                    <input type="checkbox" id="secret_enabled" name="secret_enabled" value="1" tal:attributes="checked config/secret_enabled" />
+                </td>
+                <td>
+                    The <input type="text" size="20" name="secret_header" id="secret_header" tal:attributes="value config/secret_header" /> header contains the (shared secret) value 
+                    <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" />.
                 </td>
             </tr>
         </table>
@@ -97,7 +118,7 @@
         </table>
     </fieldset>
     <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
-        <legend>Strip domains from login names:</legend>
+        <legend>Strip domains from login names containing...</legend>
         <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 0 2em">
             <tr valign="top">
                 <td>
@@ -122,17 +143,6 @@
                 </td>
             </tr>
         </table>
-    </fieldset>
-    
-    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
-        <p style="margin: 1em 0 0 0; padding: 0">
-            Login name is in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header.
-        </p>
-        
-        <p style="margin: 1em 0 0 0; padding: 0">
-            Require the <input type="text" size="20" name="secret_header" id="secret_header" tal:attributes="value config/secret_header" /> header to contain the (shared secret) value 
-            <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" />.  When no value is present, this check is ignored.
-        </p>
     </fieldset>
     
     <input type="submit" name="submit" value="Save Changes" style="margin: 1em 0 0 0" />
