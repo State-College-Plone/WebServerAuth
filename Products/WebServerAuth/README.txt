@@ -337,6 +337,14 @@ Configuration
         header (for instance, if you are using IISCosign, which has
         "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
         in here.
+        
+    Require a shared secret
+    
+        To protect against local forgery attacks a header (HTTP_WSA_SECRET by default)
+        may be required to contain a shared secret value before credential extraction
+        will take place.  If the shared secret value is left blank (the default), credential
+        extraction will occur normally.
+
 
 
 Ancestry
@@ -425,7 +433,13 @@ Support
 
 
 Version History
-    
+     
+    ' ' 1.7 -- ' '
+
+        * Added shared secret support.  A header (HTTP_WSA_SECRET by default) can be
+          checked for an optional shared secret value.  When specfied, this value must
+          match the header value for credential extraction to take place.  
+
     ' ' 1.6 -- ' '
     
         * Added option to check for the presence of a header before

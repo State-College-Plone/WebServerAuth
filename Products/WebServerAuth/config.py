@@ -14,12 +14,14 @@ cookieCheckEnabledKey = 'cookie_check_enabled'
 cookieNameKey = 'cookie_name'
 challengeHeaderEnabledKey = 'challenge_header_enabled'
 challengeHeaderNameKey = 'challenge_header_name'
-
+secretHeaderKey = 'secret_header'
+secretValueKey = 'secret_value'
 
 # Configuration defaults for various versions:
 
 defaultUsernameHeader = 'HTTP_X_REMOTE_USER'
 defaultChallengeHeader = 'HTTP_WSA_SHOULD_CHALLENGE'
+defaultSecretHeader = 'HTTP_WSA_SECRET'
 
 configDefaults = {
         # It's useful to be able to turn this off for Shibboleth and
@@ -56,6 +58,12 @@ configDefaults1_6 = {
     challengeHeaderNameKey: defaultChallengeHeader
 }
 configDefaults.update(configDefaults1_6)
+
+configDefaults1_7 = {
+    secretHeaderKey: defaultSecretHeader,
+    secretValueKey: ''
+}
+configDefaults.update(configDefaults1_7)
 
 defaultChallengePattern = re.compile('http://(.*)')
 defaultChallengeReplacement = r'https://\1'
