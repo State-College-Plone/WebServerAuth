@@ -13,7 +13,7 @@ from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
 
 from Products.WebServerAuth.utils import wwwDirectory
-from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, configDefaults1_7, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader, secretHeaderKey, secretValueKey
+from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader, secretHeaderKey, secretValueKey
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -196,13 +196,9 @@ class MultiPlugin(BasePlugin):
             self._config.update(configDefaults1_5)
         
         # Upgrade to 1.6 format:
-        if challengeHeaderEnabledKey not in self._config:
+        if challengeHeaderEnabledKey not in self._config or secretHeaderKey not in self._config:
             self._config.update(configDefaults1_6)
             
-        # Upgrade to 1.7 format:
-        if secretHeaderKey not in self._config:
-            self._config.update(configDefaults1_7)
-        
         return self._config
     
     

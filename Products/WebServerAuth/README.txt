@@ -434,12 +434,6 @@ Support
 
 Version History
      
-    ' ' 1.7 -- ' '
-
-        * Added shared secret support.  A header (HTTP_WSA_SECRET by default) can be
-          checked for an optional shared secret value.  When specfied, this value must
-          match the header value for credential extraction to take place.  
-
     ' ' 1.6 -- ' '
     
         * Added option to check for the presence of a header before
@@ -447,6 +441,10 @@ Version History
         
         * Factored the configuration and upgrade stuff, which was getting pretty
           long, out of plugin.py.
+          
+        * Added shared secret support.  A header (HTTP_WSA_SECRET by default) can be
+          checked for an optional shared secret value.  When specfied, this value must
+          match the header value for credential extraction to take place.  
 
     ' ' 1.5 -- ' '
     

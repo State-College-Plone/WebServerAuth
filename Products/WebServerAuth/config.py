@@ -55,15 +55,11 @@ configDefaults.update(configDefaults1_5)
 
 configDefaults1_6 = {
     challengeHeaderEnabledKey: False,
-    challengeHeaderNameKey: defaultChallengeHeader
-}
-configDefaults.update(configDefaults1_6)
-
-configDefaults1_7 = {
+    challengeHeaderNameKey: defaultChallengeHeader,
     secretHeaderKey: defaultSecretHeader,
     secretValueKey: ''
 }
-configDefaults.update(configDefaults1_7)
+configDefaults.update(configDefaults1_6)
 
 defaultChallengePattern = re.compile('http://(.*)')
 defaultChallengeReplacement = r'https://\1'
