@@ -31,7 +31,7 @@
             </tr>
             <tr valign="top">
                 <td style="padding-top: 1em" colspan="2">
-                Only when...
+                    Only when...
                 </td>
             </tr>
         </table>
@@ -41,7 +41,8 @@
                     <input type="checkbox" id="cookie_check_enabled" name="cookie_check_enabled" value="1" tal:attributes="checked config/cookie_check_enabled" />
                 </td>
                 <td>
-                   <label for="cookie_check_enabled">The</label> <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" /> <label for="cookie_check_enabled">cookie is present</label>
+                   <label for="cookie_check_enabled">The</label> <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" /> <label for="cookie_check_enabled">cookie is present</label><br />
+                   <span class="form-help">For when you can't keep the web server from passing authentication information</span>
                 </td>
             </tr>
             <tr valign="top">
@@ -49,8 +50,9 @@
                     <input type="checkbox" id="secret_enabled" name="secret_enabled" value="1" tal:attributes="checked config/secret_enabled" />
                 </td>
                 <td>
-                    The <input type="text" size="20" name="secret_header" id="secret_header" tal:attributes="value config/secret_header" /> header contains the (shared secret) value 
-                    <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" />
+                    The <input type="text" size="20" name="secret_header" id="secret_header" tal:attributes="value config/secret_header" /> header contains the secret value 
+                    <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" /><br />
+                    <span class="form-help">To keep untrusted local PHP scripts from authenticating to Zope</span>
                 </td>
             </tr>
         </table>
