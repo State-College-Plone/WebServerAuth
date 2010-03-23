@@ -49,7 +49,11 @@ Upgrading
         3. Start up Zope.
         
         4. Go to your-plone-site &rarr; site setup &rarr; Add-on Products, and
-           reinstall WebServerAuth. (Your settings will be preserved.)
+           reinstall WebServerAuth. (Your settings will be preserved.) If you
+           are using Plone 3.3 or later and don't see the option to reinstall,
+           just skip this step. If the message in the Add-on Product control
+           panel bothers you, you can effect a reinstall using
+           portal_quickinstaller in the ZMI.
 
     
     From apachepas and/or AutoMemberMakerPasPlugin
@@ -227,6 +231,22 @@ Configuration
             web server recognizes. If somebody cares to donate themes that fix
             the UI, I'll be happy to include them.
     
+        Only when the such-and-such cookie is present
+        
+            In some situations, it is useful to be able to control whether the
+            user is logged in or not based on a cookie, even if the actual
+            authentication takes place outside Zope. For example, IIS can be
+            configured to use integrated Windows authentication, in which case
+            NTLM or Kerberos authentication will be used to set the
+            X-Remote-User header. However, you may not want your users to appear
+            logged in to Zope at all times, for example because you can cache
+            content much more efficiently if everyone is anonymous.
+
+            The solution is to use a custom view or something outside Zope to
+            set a cookie to indicate that the user should be logged in, and then
+            enable this option. If the cookie is absent, the user will not be
+            authenticated.
+    
     To prompt the user for credentials, redirect...
     
         To the HTTPS version of wherever he was going
@@ -247,6 +267,39 @@ Configuration
             it's an HTTPS URL, and "use
             backreferences":http://docs.python.org/library/re.html#re.sub (like
             \1, \2, and so on) to substitute in the parts you captured above.
+        
+        Only when the such-and-such request header is present
+        
+            In some scenarios, WebServerAuth's redirection to HTTPS is
+            counterproductive. For example, if you ssh tunnel directly to Zope
+            to avoid a web server and caching proxy, redirecting to HTTPS would
+            mean speaking HTTPS directly to Zope, which doesn't even listen on
+            port 443. This option lets you automatically disable such
+            redirections when there is no web server in front of Zope.
+
+            If you turn this option on, you must also have your web server (or
+            something in front of Zope) set the specified header, at least for
+            all requests that could result in a WebServerAuth redirect. In a
+            typical Apache setup, doing this in your port-80 vhost would
+            suffice::
+
+              RequestHeader set WSA_SHOULD_CHALLENGE yep
+
+            What you set the header to is immaterial; as long as it's present,
+            WebServerAuth is happy.
+            
+            Note that you'll probably still have to first authenticate at the
+            root level of the ZMI and then wend your way into your Plone sites
+            (if any), since WebServerAuth's redirecting override of login_form
+            still redirects unconditionally. We might fix this later if we can
+            bring ourselves to duplicate the custom acquisition logic of
+            portal_skins.
+            
+            A variety of configuration-free heuristics were considered before
+            arriving at this explicit-header option, but there was always some
+            special case to confound them: for example, custom redirect patterns
+            that include strange explicit ports or setups that use a special
+            login page rather than just any HTTPS-protocol request.
 
     Strip domains from login names
     
@@ -284,22 +337,6 @@ Configuration
         header (for instance, if you are using IISCosign, which has
         "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
         in here.
-    
-    Only when the such-and-such cookie is present
-    
-        In some situations, it is useful to be able to control whether the
-        user is logged in or not based on a cookie, even if the actual
-        authentication takes place outside Zope. For example, IIS can be
-        configured to use integrated Windows authentication, in which case
-        NTLM or Kerberos authentication will be used to set the
-        X-Remote-User header. However, you may not want your users to appear
-        logged in to Zope at all times, for example because you can cache
-        content much more efficiently if everyone is anonymous.
-        
-        The solution is to use a custom view or something outside Zope to set
-        a cookie to indicate that the user should be logged in, and then
-        enable this option. If the cookie is absent, the user will not be
-        authenticated.
 
 
 Ancestry
@@ -357,7 +394,7 @@ Future Plans
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
       they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.5 if you do. Otherwise, I might not bother.
+      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.6 if you do. Otherwise, I might not bother.
 
 
 Author
@@ -384,11 +421,19 @@ Support
     stuff.
 
     Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.5.
+    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.6.
 
 
 Version History
     
+    ' ' 1.6 -- ' '
+    
+        * Added option to check for the presence of a header before
+          challenging, which makes ssh tunneling to Zope less impossible.
+        
+        * Factored the configuration and upgrade stuff, which was getting pretty
+          long, out of plugin.py.
+
     ' ' 1.5 -- ' '
     
         * Added option to check for the presence of a cookie before
