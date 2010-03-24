@@ -407,20 +407,19 @@ Future Plans
       care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.6 if you do. Otherwise, I might not bother.
 
 
-Author
+Authors
 
-    Erik Rose of the WebLion group at Penn State University
+    * Erik Rose of the WebLion group at Penn State University
 
+    * Rocky Burt wrote the pre-1.1 versions of apachepas, which, along with
+      Erik's AutoMemberMakerPasPlugin, led to WebServerAuth.
 
-Thanks To...
+    * Mark James created the ZMI icon, available from
+      http://www.famfamfam.com/lab/icons/silk/ .
 
-    * Rocky Burt, who wrote the pre-1.1 versions of apachepas, which, along with
-      my AutoMemberMakerPasPlugin, led to WebServerAuth.
-
-    * Mark James for the ZMI icon, available from
-      http://www.famfamfam.com/lab/icons/silk/.
-
-    * Martin Aspeli for his work on versions 1.4 and 1.5.
+    * Martin Aspeli drove the features in versions 1.4 and 1.5.
+    
+    * Craig Haynal conceived and implemented the shared secret feature.
 
 
 Support
