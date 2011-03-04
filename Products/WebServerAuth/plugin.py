@@ -3,7 +3,13 @@ import logging
 import re
 
 from AccessControl import ClassSecurityInfo
-from AccessControl.class_init import InitializeClass
+try:
+    from AccessControl.class_init import InitializeClass # Zope >=2.13
+except:
+    try:
+        from App.class_init import InitializeClass # Zope>=2.11.13 and Zope>=2.10.8
+    except:
+        from Globals import InitializeClass # Zope <2.10.8 and <2.11.13
 from persistent.dict import PersistentDict
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
