@@ -24,7 +24,7 @@ setup(
         "Topic :: System :: Systems Administration :: Authentication/Directory"
     ],
     keywords='web zope plone authentication pas zope2',
-    author='Erik Rose',
+    author='WebLion Group, Penn State',
     author_email='support@weblion.psu.edu',
     url='http://plone.org/products/webserverauth',
     license='GPL',

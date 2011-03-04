@@ -189,7 +189,7 @@ Troubleshooting
         header to Zope. If you are using Apache, make sure you included the
         <Proxy *> block above.
 
-    I can't access any of the acl_users screens, add users, or do anything useful in the Plone site, but I can get into the root-level acl_users just fine.
+    I can't access any of the acl_users screens, add users, or do anythinguseful in the Plone site, but I can get into the root-level acl_users just fine.
         
         If you have an existing user with the same ID as your user inside the
         Plone site, this will override your permission/role settings, so you
@@ -235,33 +235,37 @@ Configuration
     
             If, for some reason, you cannot use the default HTTP_X_REMOTE_USER
             header (for instance, if you are using IISCosign, which has
-            "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth looks
-            in here.
+            "HTTP_REMOTE_USER" hard-coded in), change the header WebServerAuth
+            looks in here.
     
         Only when...
         
             The such-and-such cookie is present
         
-                In some situations, it is useful to be able to control whether the
-                user is logged in or not based on a cookie, even if the actual
-                authentication takes place outside Zope. For example, IIS can be
-                configured to use integrated Windows authentication, in which case
-                NTLM or Kerberos authentication will be used to set the
-                X-Remote-User header. However, you may not want your users to appear
-                logged in to Zope at all times, for example because you can cache
-                content much more efficiently if everyone is anonymous.
+                In some situations, it is useful to be able to control whether
+                the user is logged in or not based on a cookie, even if the
+                actual authentication takes place outside Zope. For example,
+                IIS can be configured to use integrated Windows authentication,
+                in which case NTLM or Kerberos authentication will be used to
+                set the X-Remote-User header. However, you may not want your
+                users to appear logged in to Zope at all times, for example
+                because you can cache content much more efficiently if everyone
+                is anonymous.
     
-                The solution is to use a custom view or something outside Zope to
-                set a cookie to indicate that the user should be logged in, and then
-                enable this option. If the cookie is absent, the user will not be
-                authenticated.
+                The solution is to use a custom view or something outside Zope
+                to set a cookie to indicate that the user should be logged in,
+                and then enable this option. If the cookie is absent, the user
+                will not be authenticated.
             
-            The such-and-such header contains the (shared secret) value this-and-that
+            The such-and-such header contains the (shared secret) value
+                this-and-that
         
-                To protect against local forgery attacks a header (HTTP_WSA_SECRET by default)
-                may be required to contain a shared secret value before credential extraction
-                will take place.  If this option is enabled and the header does not contain the
-                shared secret value, the user will not be authenticated.
+                To protect against local forgery attacks a header
+                (HTTP_WSA_SECRET by default) may be required to contain a
+                shared secret value before credential extraction will take
+                place.  If this option is enabled and the header does not
+                contain the shared secret value, the user will not be
+                authenticated.
     
     To prompt the user for credentials, redirect...
     
@@ -382,7 +386,8 @@ Ancestry
         
         * Is one product instead of two
         
-        * Takes over the login_form so people can't log in wrong even if they try
+        * Takes over the login_form so people can't log in wrong even if they
+          try
 
 
 Testing
@@ -403,8 +408,7 @@ Future Plans
     
     * In stock Plone, users show up in the Users tab search (I'm not talking
       about the Users and Groups control panel, mind you) immediately after
-      they're created. With WebServerAuth, they never show up. Does anybody
-      care? Please "file a ticket":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.6 if you do. Otherwise, I might not bother.
+      they're created. With WebServerAuth, they never show up.
 
 
 Authors
@@ -429,9 +433,6 @@ Support
     "WebLion wiki":http://weblion.psu.edu/trac/weblion is full of good
     stuff.
 
-    Please report bugs using the
-    "WebLion issue tracker":https://weblion.psu.edu/trac/weblion/newticket?component=WebServerAuth&version=1.6.
-
 
 Version History
      
@@ -443,9 +444,10 @@ Version History
         * Factored the configuration and upgrade stuff, which was getting pretty
           long, out of plugin.py.
           
-        * Added shared secret support.  A header (HTTP_WSA_SECRET by default) can be
-          checked for an optional shared secret value.  When enabled and specfied, this
-          value must match the header value for credential extraction to take place.
+        * Added shared secret support.  A header (HTTP_WSA_SECRET by default)
+          can be checked for an optional shared secret value.  When enabled and
+          specfied, this value must match the header value for credential
+          extraction to take place.
           
         * Reworked the ZMI options page to be more consistent.
 
@@ -526,7 +528,7 @@ Version History
 
 License
 
-    Copyright (c) 2008-2010 The Pennsylvania State University. WebLion products
+    Copyright (c) 2008-2011 The Pennsylvania State University. WebLion products
     are developed and maintained by the WebLion Project Team, its partners, and
     members of the Penn State Plone Users Group.
 
