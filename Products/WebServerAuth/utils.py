@@ -1,5 +1,8 @@
 import os.path
-from App.Common import package_home
+try:
+    from App.Common import package_home
+except:
+    from Globals import package_home
 
 wwwDirectory = os.path.join(package_home(globals()), 'www')
 
