@@ -1,0 +1,153 @@
+<div tal:replace="structure here/manage_page_header|nothing" />
+<div tal:replace="structure here/manage_tabs" />
+
+<h2 tal:define="form_title string:WebServerAuth Options"
+    tal:replace="structure here/manage_form_title" />
+
+<form tal:define="config context/configForView" method="post" action="manage_changeConfig">
+    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
+        <legend>Authenticate...</legend>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 0 2em">
+            <tr valign="top">
+                <td style="margin-left: 2em">
+                    <input type="radio" name="authenticate_everybody" id="authenticate_everybody_1" value="1" tal:attributes="checked config/authenticate_everybody" />
+                </td>
+                <td>
+                    <label for="authenticate_everybody_1">Any user the web server recognizes (recommended)</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="margin-left: 2em">
+                    <input type="radio" name="authenticate_everybody" id="authenticate_everybody_0" value="0" tal:attributes="checked not:config/authenticate_everybody" />
+                </td>
+                <td>
+                    <label for="authenticate_everybody_0">Only users with pre-existing Plone accounts</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-top: 1em" colspan="2">
+                    Using the login name in the <input type="text" size="20" name="username_header" id="username_header" tal:attributes="value config/username_header" /> header
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-top: 1em" colspan="2">
+                    Only when...
+                </td>
+            </tr>
+        </table>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
+            <tr valign="top">
+                <td style="padding-left: 2em">
+                    <input type="checkbox" id="cookie_check_enabled" name="cookie_check_enabled" value="1" tal:attributes="checked config/cookie_check_enabled" />
+                </td>
+                <td>
+                   <label for="cookie_check_enabled">The</label> <input type="text" size="20" name="cookie_name" id="cookie_name" tal:attributes="value config/cookie_name" /> <label for="cookie_check_enabled">cookie is present</label><br />
+                   <span class="form-help">For when you can't keep the web server from passing authentication information</span>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-left: 2em">
+                    <input type="checkbox" id="secret_enabled" name="secret_enabled" value="1" tal:attributes="checked config/secret_enabled" />
+                </td>
+                <td>
+                    The <input type="text" size="20" name="secret_header" id="secret_header" tal:attributes="value config/secret_header" /> header contains the secret value 
+                    <input type="text" size="20" name="secret_value" id="secret_value" tal:attributes="value config/secret_value" /><br />
+                    <span class="form-help">To keep untrusted local PHP scripts from authenticating to Zope</span>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
+        <legend>To prompt the user for credentials, redirect...</legend>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 1em 2em">
+            <tr valign="top">
+                <td>
+                    <input type="radio" name="use_custom_redirection" id="use_custom_redirection_0" value="0" tal:attributes="checked not:config/use_custom_redirection" />
+                </td>
+                <td>
+                    <label for="use_custom_redirection_0">To the HTTPS version of wherever he was going</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    <input type="radio" name="use_custom_redirection" id="use_custom_redirection_1" value="1" tal:attributes="checked config/use_custom_redirection" />
+                </td>
+                <td>
+                    <label for="use_custom_redirection_1">To a custom URL:</label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                </td>
+                <td>
+                    <table border="0" cellspacing="0" cellpadding="2">
+                        <tr valign="top">
+                            <td align="right">
+                                <label for="challenge_pattern">Matching&nbsp;pattern:</label>
+                            </td>
+                            <td>
+                                <input name="challenge_pattern" id="challenge_pattern" type="text" size="40" tal:attributes="value config/challenge_pattern_uncompiled" />
+                                <p class="form-help" style="margin: .5em 0">
+                                    <font size="-1">A regular expression matching every URL in your Plone site and capturing (using parentheses) the parts you'll need when constructing the replacement pattern.</font>
+                                </p>
+                                <p class="form-help" style="margin: .5em 0">
+                                    <font size="-1"><a href="http://www.python.org/doc/2.5.2/lib/re-syntax.html" target="_blank">Regular expression reference</a></font>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <td align="right">
+                                <label for="challenge_replacement">Replacement&nbsp;pattern:</label>
+                            </td>
+                            <td>
+                                <input name="challenge_replacement" id="challenge_replacement" type="text" size="40" tal:attributes="value config/challenge_replacement" />
+                                <p class="form-help" style="margin: .5em 0">
+                                    <font size="-1">The URL to redirect to. Make sure it's an HTTPS URL, and <a href="http://docs.python.org/library/re.html#re.sub">use backreferences</a> (like \1, \2, and so on) to substitute in the parts you captured above.</font>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td style="padding-top: 1em">
+                    <input type="checkbox" id="challenge_header_enabled" name="challenge_header_enabled" value="1" tal:attributes="checked config/challenge_header_enabled" />
+                </td>
+                <td style="padding-top: 1em">
+                   <label for="challenge_header_enabled">Only when the</label> <input type="text" size="20" name="challenge_header_name" id="challenge_header_name" tal:attributes="value config/challenge_header_name" /> <label for="challenge_header_enabled">request header is present</label>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
+        <legend>Strip domains from login names containing...</legend>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 0 2em">
+            <tr valign="top">
+                <td>
+                    <input type="checkbox" id="strip_domain_names" name="strip_domain_names" value="1" tal:attributes="checked config/strip_domain_names" />
+                </td>
+                <td>
+                    <label for="strip_domain_names">
+                        Email-like domains<br />
+                        <span class="form-help">fred@example.com &rarr; fred</span>
+                    </label>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    <input type="checkbox" id="strip_windows_domain" name="strip_windows_domain" value="1" tal:attributes="checked config/strip_windows_domain" />
+                </td>
+                <td>
+                    <label for="strip_windows_domain">
+                        Windows domains<br />
+                        <span class="form-help">EXAMPLE\fred &rarr; fred</span>
+                    </label>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    
+    <input type="submit" name="submit" value="Save Changes" style="margin: 1em 0 0 0" />
+</form>
+
+<tal:footer tal:replace="structure here/manage_page_footer|nothing">Footer</tal:footer>

@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="WebServerAuth">
+
+<head>
+    <metal:block fill-slot="column_one_slot" />
+    <metal:block fill-slot="column_two_slot" />
+</head>
+
+<body>
+
+<div metal:fill-slot="main"
+  tal:define="url python:context.REQUEST.ACTUAL_URL;
+              login_url python:context.acl_users.web_server_auth.loginUrl(url[:url.rindex('/login_form')] + '/logged_in');
+              dummy python:context.REQUEST.response.redirect(login_url, status=301, lock=1)">
+  <div id="content">
+    <p>
+      <a i18n:translate="description_log_in_here" tal:attributes="href login_url">Please log in here</a>.
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
