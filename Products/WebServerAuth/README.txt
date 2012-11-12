@@ -436,6 +436,10 @@ Support
 
 Version History
      
+    ' ' 1.7 -- ' '
+
+        * Nothing yet.
+
     ' ' 1.6 -- ' '
     
         * Added option to check for the presence of a header before
