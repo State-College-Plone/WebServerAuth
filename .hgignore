@@ -1,0 +1,22 @@
+syntax: glob
+*.o
+*.lo
+*.la
+#*#
+.*.rej
+*.rej
+.*~
+*~
+.#*
+.DS_Store
+._*
+*.pyc
+*~.nib
+*.egg-info
+.installed.cfg
+*.pt.py
+*.cpt.py
+*.zpt.py
+*.html.py
+*.egg
+.Trashes
