@@ -17,6 +17,7 @@ challengeHeaderNameKey = 'challenge_header_name'
 secretEnabledKey = 'secret_enabled'
 secretHeaderKey = 'secret_header'
 secretValueKey = 'secret_value'
+forceLowercaseUsernamesKey = 'force_lowercase_usernames'
 
 # Configuration defaults for various versions:
 
@@ -55,13 +56,18 @@ configDefaults1_5 = {
 configDefaults.update(configDefaults1_5)
 
 configDefaults1_6 = {
-    challengeHeaderEnabledKey: False,
-    challengeHeaderNameKey: defaultChallengeHeader,
-    secretHeaderKey: defaultSecretHeader,
-    secretValueKey: '',
-    secretEnabledKey: False
-}
+        challengeHeaderEnabledKey: False,
+        challengeHeaderNameKey: defaultChallengeHeader,
+        secretHeaderKey: defaultSecretHeader,
+        secretValueKey: '',
+        secretEnabledKey: False
+    }
 configDefaults.update(configDefaults1_6)
+
+configDefaults1_7 = {
+        forceLowercaseUsernamesKey: False
+    }
+configDefaults.update(configDefaults1_7)
 
 defaultChallengePattern = re.compile('http://(.*)')
 defaultChallengeReplacement = r'https://\1'

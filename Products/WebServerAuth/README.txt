@@ -438,7 +438,7 @@ Version History
      
     ' ' 1.7 -- ' '
 
-        * Nothing yet.
+        * Added option to make usersnames lower-case.
 
     ' ' 1.6 -- ' '
     

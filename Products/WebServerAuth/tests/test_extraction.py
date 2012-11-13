@@ -1,7 +1,7 @@
 """Unit tests for extraction plugin"""
 
 from Products.WebServerAuth.plugin import usernameKey, defaultUsernameHeader, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, cookieNameKey, cookieCheckEnabledKey
-from Products.WebServerAuth.config import defaultSecretHeader, secretValueKey, secretEnabledKey
+from Products.WebServerAuth.config import defaultSecretHeader, secretValueKey, secretEnabledKey, forceLowercaseUsernamesKey
 from Products.WebServerAuth.tests.base import WebServerAuthTestCase
 
 _username = 'someUsername'
@@ -84,7 +84,15 @@ class TestExtraction(WebServerAuthTestCase):
     def testWinDomainStrippingOn(self):
         """Assert choosing to strip the domain off the end of a domain\user works."""
         self._testDomainStripping(stripWindowsDomainKey, True, _userWinDomain, _username)
-    
+
+    def testForceLowercaseUsernamesOff(self):
+        """Assert choosing to not lower case the usernames works."""
+        self._testDomainStripping(forceLowercaseUsernamesKey, False, 'AbCd123', 'AbCd123')
+
+    def testForceLowercaseUsernamesOn(self):
+        """Assert choosing to not lower case the usernames works."""
+        self._testDomainStripping(forceLowercaseUsernamesKey, True, 'AbCd123', 'abcd123')
+
             
 def test_suite():
     from unittest import TestSuite, makeSuite
