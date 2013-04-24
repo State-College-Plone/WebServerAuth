@@ -435,12 +435,16 @@ Support
 
 
 Version History
-     
-    ' ' 1.7 -- ' '
+
+    ' ' 1.7.1 -- ' '
 
         * Fix to be more tolerant of variations in the stack when looking for 
           getUserById calls.  This change should protect against future
           hotfixes and/or monkey patches to PAS.
+     
+    ' ' 1.7 -- ' '
+
+        * Added option to make usersnames lower-case.
 
     ' ' 1.6 -- ' '
     

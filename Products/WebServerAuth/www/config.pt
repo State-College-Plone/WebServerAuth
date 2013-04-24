@@ -146,6 +146,22 @@
             </tr>
         </table>
     </fieldset>
+    <fieldset style="margin: .5em 0 0 0; padding: .5em; border: none">
+        <legend>Adjust login names</legend>
+        <table border="0" cellspacing="0" cellpadding="2" style="margin: 0 0 0 2em">
+            <tr valign="top">
+                <td>
+                    <input type="checkbox" id="force_lowercase_usernames" name="force_lowercase_usernames" value="1" tal:attributes="checked config/force_lowercase_usernames" />
+                </td>
+                <td>
+                    <label for="force_lowercase_usernames">
+                        Force lowercase<br />
+                        <span class="form-help">UserName &rarr; username</span>
+                    </label>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
     
     <input type="submit" name="submit" value="Save Changes" style="margin: 1em 0 0 0" />
 </form>

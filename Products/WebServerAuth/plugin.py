@@ -19,7 +19,7 @@ from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.permissions import ManageUsers
 
 from Products.WebServerAuth.utils import wwwDirectory
-from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader, secretHeaderKey, secretValueKey, secretEnabledKey
+from Products.WebServerAuth.config import configDefaults, configDefaults1_1, configDefaults1_5, configDefaults1_6, configDefaults1_7, defaultChallengePattern, defaultChallengeReplacement, stripDomainNamesKey, stripWindowsDomainKey, usernameHeaderKey, authenticateEverybodyKey, useCustomRedirectionKey, challengePatternKey, challengeReplacementKey, cookieCheckEnabledKey, cookieNameKey, challengeHeaderEnabledKey, challengeHeaderNameKey, defaultUsernameHeader, secretHeaderKey, secretValueKey, secretEnabledKey, forceLowercaseUsernamesKey
 
 # Key for PAS extraction dict:
 usernameKey = 'apache_username'
@@ -187,6 +187,8 @@ class MultiPlugin(BasePlugin):
             elif self.config[stripWindowsDomainKey] and '\\' in login:
                 # Active Directory user expressions have exactly 1 backslash.
                 login = login.split('\\', 1)[1]
+            if self.config[forceLowercaseUsernamesKey]:
+                login = login.lower()
         return login
     
     @property
@@ -210,6 +212,10 @@ class MultiPlugin(BasePlugin):
         # Upgrade to 1.6 format:
         if secretEnabledKey not in self._config:
             self._config.update(configDefaults1_6)
+
+        # Upgrade to 1.7 format:
+        if forceLowercaseUsernamesKey not in self._config:
+            self._config.update(configDefaults1_7)
             
         return self._config
     
@@ -241,7 +247,7 @@ class MultiPlugin(BasePlugin):
     security.declareProtected(ManageUsers, 'manage_changeConfig')
     def manage_changeConfig(self, REQUEST=None):
         """Update my configuration based on form data."""
-        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey, challengeHeaderEnabledKey, secretEnabledKey]:
+        for key in [stripDomainNamesKey, stripWindowsDomainKey, authenticateEverybodyKey, useCustomRedirectionKey, cookieCheckEnabledKey, challengeHeaderEnabledKey, secretEnabledKey, forceLowercaseUsernamesKey]:
             self.config[key] = REQUEST.form.get(key) == '1'  # Don't raise an exception; unchecked checkboxes don't get submitted.
         for key in [usernameHeaderKey, challengeReplacementKey, cookieNameKey, challengeHeaderNameKey, secretHeaderKey, secretValueKey]:
             self.config[key] = REQUEST.form[key]
