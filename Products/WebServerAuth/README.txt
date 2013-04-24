@@ -438,7 +438,9 @@ Version History
      
     ' ' 1.7 -- ' '
 
-        * Nothing yet.
+        * Fix to be more tolerant of variations in the stack when looking for 
+          getUserById calls.  This change should protect against future
+          hotfixes and/or monkey patches to PAS.
 
     ' ' 1.6 -- ' '
     

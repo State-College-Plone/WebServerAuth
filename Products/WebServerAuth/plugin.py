@@ -80,9 +80,15 @@ class MultiPlugin(BasePlugin):
         """
         # Unless we're admitting non-Plone-dwelling users, don't pretend the user is there. Also, don't enumerate unless we seem to have been called by getUserById(). We're very conservative, even checking the types of things like exact_match. Also also, don't enumerate unless we're searching for the currently logged in user. Heck, we even look at the stack now, because searchUsers() (as called by searchPrincipals()) calls us the same way getUserById() does.
         if self.config[authenticateEverybodyKey] and (id is not None and login is None and exact_match is True and sort_by is None and max_results is None and not kw) and (self.REQUEST and self._normalizedLoginName(self.REQUEST.environ.get(self.config[usernameHeaderKey])) == id):  # may be redundant with the stack inspection below, but it makes me feel warm and fuzzy for now
+            # I can't find any situation in which we get here in the code and we are not called by getUserById; perhaps we should eliminate this test in a future release? (cah190)
             stack = inspect.stack()
+            calledByGetUserById = False
             try:
-                calledByGetUserById = stack[2][3] == 'getUserById'  # getUserById calls _verifyUser, which calls us
+                # search stack for getUserById call since hotfixes/monkey patches may vary the position in the stack
+                for frame in stack:
+                    if frame[3] == 'getUserById':
+                        calledByGetUserById = True
+                        break
             finally:
                 del stack  # Dispose of frames, as recommended by http://docs.python.org/lib/inspect-stack.html
             if calledByGetUserById:
